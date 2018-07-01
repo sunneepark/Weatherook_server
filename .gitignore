@@ -33,7 +33,7 @@ bower_components
 build/Release
 
 # Dependency directories
-/weatherook/config/
+config/
 node_modules/
 jspm_packages/
 
