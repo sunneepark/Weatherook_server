@@ -8,7 +8,7 @@ const jwt = require('../../module/jwt.js');
 router.post('/', async function(req, res){
     let user_id = req.body.user_id;
     let user_pw = req.body.user_pw; 
-
+   
     if(!user_id || !user_pw){ // id, pw 입력 오류 시
         res.status(400).send({
             message : "Null Value"
