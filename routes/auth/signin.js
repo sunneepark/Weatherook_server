@@ -19,7 +19,7 @@ router.post('/', async function(req, res){
         //사용자 정보가 존재하는지 체크 
         let checkUserQuery = "SELECT * FROM user WHERE user_id=?"; 
         let checkUserResult = await db.queryParam_Arr(checkUserQuery, [user_id]);
-        console.log("sdf");
+
         if(!checkUserResult){ //쿼리 오류
             res.status(500).send({
                 message : "Internal Server Error"
