@@ -7,5 +7,6 @@ var router = express.Router();
 // });
 
 router.use('/auth', require('./auth/index.js'))
+router.use('/user', require('./user/index.js'))
 
 module.exports = router;
