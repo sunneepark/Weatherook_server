@@ -30,7 +30,7 @@ router.post('/', async function(req, res){
                 message : "Internal Server Error1"
             }); 
         }
-        else if(checkUserResult.lenth === 1){ //이미 존재하는 유저 정보 입력
+        else if(checkUserResult.length === 1){ //이미 존재하는 유저 정보 입력
             res.status(400).send({
                 message : "Already Exist"
             }); 
