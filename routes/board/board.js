@@ -98,6 +98,7 @@ router.post('/', upload.single('board_img'), async function(req, res){
 router.get('/:board_idx', async function(req, res){
     let board_idx = req.params.board_idx; 
     
+    let hashtag_desc; 
     //board_idx 게시글이 존재하는지 확인
     //board_idx 입력 오류 
     if(!board_idx){
@@ -114,34 +115,44 @@ router.get('/:board_idx', async function(req, res){
         let selectWriterOneBoardResult = await db.queryParam_Arr(selectWriterOneBoardQuery, [board_idx]);
 
         //hashtag_desc를 가져오기 위한 hashtag 테이블과 board_hashtag 테이블에 접근
-        let selectHashtagInOneBoardQuery = 'SELECT * FROM board_hashtag WHERE board_idx = ?'; 
-        let selectHashtagInOneBoardResult = await db.queryParam_Arr(selectHashtagInOneBoardQuery, [board_idx]);
-        if(selectHashtagInOneBoardResult == []){ //hashtag가 존재하지 않을 때 
-            selectHashtagInOneBoardResult[0] = null;
-        }
-        else if (!selectHashtagInOneBoardResult){
+        let checkHashtagInBoard = 'SELECT * FROM board_hashtag WHERE board_idx = ?'; 
+        let checkHashtagInBoardRes = await db.queryParam_Arr(checkHashtagInBoard, [board_idx]);
+        if(!checkHashtagInBoardRes){
             res.status(500).send({
                 message : "Internal Server Error"
-            });
-            return;
+            }); 
         }
-        else {//hashtag가 존재한다면 hashtag 테이블에서 hashtag_desc를 받아온다. 
-            let getHashtagDescQuery = 'SELECT * FROM hashtag WHERE hashtag_idx = ?';
-            hashtag_idx = selectHashtagInOneBoardResult[0].hashtag_idx;
-            let getHashtagDescResult = await db.queryParam_Arr(getHashtagDescQuery, hashtag_idx)
-            if(!getHashtagDescResult)
+        else {
+            //hashtag가 존재하지 않을 때, 
+            if(checkHashtagInBoardRes[0] == null)
             {
-                res.status(500).send({
-                    message : "Internal Server Error"
-                }); 
+                hashtag_desc = null; 
+            }
+            else {
+                let getHashtagDesc = 'SELECT * FROM hashtag WHERE board_idx = ?'; 
+                let getHashtagDescRes = await db.queryParam_Arr(getHashtagDesc, [board_idx]);
+
+                if(!getHashtagDescRes){
+                    res.status(500).send({
+                        message : "Internal Server Error"
+                    }); 
+                    return; 
+                }
+
+                else {
+                    hashtag_desc = getHashtagDescRes[0].hashtag_desc; 
+                }
             }
         }
 
+
+
         //like_cnt를 가져오기 위한 board_like와 like 테이블 접근
-        let selectLikesCnt = 'SELECT count(*) FROM board_like WHERE board_idx = ?';
+        let selectLikesCnt = 'SELECT count(*) as count FROM board_like WHERE board_idx = ?';
         let selectLikesCntResult = await db.queryParam_Arr(selectLikesCnt, [board_idx]);
 
-        //board_temp_min과 board_temp_max를 가져오자.
+        
+        
         
         
         //쿼리 에러
@@ -157,8 +168,8 @@ router.get('/:board_idx', async function(req, res){
                 user_idx : selectWriterOneBoardResult[0].user_idx, 
                 board_img : selectOneBoardResult[0].board_img,
                 board_desc : selectOneBoardResult[0].board_desc, 
-                hashtag_desc : getHashtagDescResult[0].hashtag_desc, 
-                like_cnt : selectLikesCntResult[0], 
+                hashtag_desc : hashtag_desc, 
+                like_cnt : selectLikesCntResult[0].count, 
                 board_temp_min : selectOneBoardResult[0].board_temp_min, 
                 board_temp_max : selectOneBoardResult[0].board_temp_max,
                 board_weather : selectOneBoardResult[0].board_weather
