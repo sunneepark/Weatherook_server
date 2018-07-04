@@ -109,17 +109,63 @@ router.get('/:board_idx', async function(req, res){
         let selectOneBoardQuery = 'SELECT * FROM board WHERE board_idx = ?'; 
         let selectOneBoardResult = await db.queryParam_Arr(selectOneBoardQuery, [board_idx]); 
     
+        //user_idx를 가져오기 위한 user_board 테이블에 접근
+        let selectWriterOneBoardQuery = 'SELECT * FROM user_board WHERE board_idx = ?'; 
+        let selectWriterOneBoardResult = await db.queryParam_Arr(selectWriterOneBoardQuery, [board_idx]);
+
+        //hashtag_desc를 가져오기 위한 hashtag 테이블과 board_hashtag 테이블에 접근
+        let selectHashtagInOneBoardQuery = 'SELECT * FROM board_hashtag WHERE board_idx = ?'; 
+        let selectHashtagInOneBoardResult = await db.queryParam_Arr(selectHashtagInOneBoardQuery, [board_idx]);
+        if(selectHashtagInOneBoardResult == []){ //hashtag가 존재하지 않을 때 
+            selectHashtagInOneBoardResult[0] = null;
+        }
+        else if (!selectHashtagInOneBoardResult){
+            res.status(500).send({
+                message : "Internal Server Error"
+            });
+            return;
+        }
+        else {//hashtag가 존재한다면 hashtag 테이블에서 hashtag_desc를 받아온다. 
+            let getHashtagDescQuery = 'SELECT * FROM hashtag WHERE hashtag_idx = ?';
+            hashtag_idx = selectHashtagInOneBoardResult[0].hashtag_idx;
+            let getHashtagDescResult = await db.queryParam_Arr(getHashtagDescQuery, hashtag_idx)
+            if(!getHashtagDescResult)
+            {
+                res.status(500).send({
+                    message : "Internal Server Error"
+                }); 
+            }
+        }
+
+        //like_cnt를 가져오기 위한 board_like와 like 테이블 접근
+        let selectLikesCnt = 'SELECT count(*) FROM board_like WHERE board_idx = ?';
+        let selectLikesCntResult = await db.queryParam_Arr(selectLikesCnt, [board_idx]);
+
+        //board_temp_min과 board_temp_max를 가져오자.
+        
+        
         //쿼리 에러
-        if(!selectOneBoardResult) {
+        if(!selectOneBoardResult || !selectWriterOneBoardResult || !selectLikesCntResult) {
             res.status(500).send({
                 message : "Internal Server Error"
             }); 
         }
+
         //정상 수행
         else {
+            let data_res = {
+                user_idx : selectWriterOneBoardResult[0].user_idx, 
+                board_img : selectOneBoardResult[0].board_img,
+                board_desc : selectOneBoardResult[0].board_desc, 
+                hashtag_desc : getHashtagDescResult[0].hashtag_desc, 
+                like_cnt : selectLikesCntResult[0], 
+                board_temp_min : selectOneBoardResult[0].board_temp_min, 
+                board_temp_max : selectOneBoardResult[0].board_temp_max,
+                board_weather : selectOneBoardResult[0].board_weather
+            }
             res.status(201).send({
                 message : "Successfully get One board", 
-                data : selectOneBoardResult[0]
+                data : data_res
             }); 
         }
     }
