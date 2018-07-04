@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const crypto = require('crypto-promise');
 const db = require('../../module/pool.js');
+const jwt = require('../../module/jwt.js');
 
 
 
@@ -42,6 +43,7 @@ router.get('/:user_idx', async function(req, res){
 
 //개인 정보 수정
 router.put('/', async function(req, res){
+    let token = jwt.sign(checkUserResult[0].user_idx);
     let user_idx = req.body.user_idx;
     let user_age = req.body.user_age;
     let user_img = req.body.user_img;
@@ -92,4 +94,9 @@ router.put('/', async function(req, res){
     }
 })
 
-module.exports = router; 
+router.get('/:user_idx')
+
+
+
+
+module.exports = router;
