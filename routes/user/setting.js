@@ -11,6 +11,7 @@ router.put('/', async function(req, res){
     let user_height =  req.body.user_height;
     let user_weight = req.body.user_weight;
     let style_idx = req.body.style_idx;
+    let 
     
 
     //user_idx 없을시 오류 
