@@ -40,8 +40,7 @@ router.post('/', async function(req, res){
                 
                 res.status(201).send({
                     message : "Successfully sign in",
-                    token : token,
-                    user_idx : checkUserResult[0].user_idx
+                    token : token
                 }); 
             }
             // 입력 pw와 저장 pw가 다른 경우 - 잘못된 비밀번호로 로그인 실패
