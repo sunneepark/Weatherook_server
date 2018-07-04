@@ -3,6 +3,44 @@ const router = express.Router();
 const crypto = require('crypto-promise');
 const db = require('../../module/pool.js');
 
+
+
+//개인 정보 보기
+router.get('/:user_idx', async function(req, res){
+    const user_idx = req.params.user_idx;
+    let user_img = req.params.user_img;
+    let user_desc = req.params.user_desc;
+    let user_age = req.params.user_age;
+    let user_height = req.params.user_height;
+    let user_weight = req.params.user_weight;
+
+    if(!user_idx){
+        res.status(400).send({
+            message : "Null Value"
+        });
+    }
+    else {
+        let showUserQuery = 'SELECT user_img, user_desc, user_age, user_height, user_weight FROM user WHERE user_idx = ?';
+        let showUserResult = await db.queryParam_Arr(showUserQuery, [user_idx]);
+
+        if(!showUserResult){
+            res.status(500).send({
+                message : "Internal Server Error"
+            });
+        }
+        else{
+            res.status(201).send({
+                message : "user show success",
+                data : {
+                    user_idx : user_idx,
+                    showUserResult
+                }
+            });
+        }
+    }
+})
+
+//개인 정보 수정
 router.put('/', async function(req, res){
     let user_idx = req.body.user_idx;
     let user_age = req.body.user_age;
