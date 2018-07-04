@@ -28,8 +28,6 @@ router.post('/', async function(req, res){
         let checkUserQuery = "SELECT * FROM user WHERE user_id = ?"
         let checkUserResult = await db.queryParam_Arr(checkUserQuery, [user_id]);
 
-        console.log("checkUserResult : " + checkUserResult);
-
         if (!checkUserResult){ //쿼리 에러
             res.status(500).send({
                 message : "Internal Server Error1"
@@ -44,9 +42,9 @@ router.post('/', async function(req, res){
             const salt = await crypto.randomBytes(32);
             const hashedpw = await crypto.pbkdf2(user_pw, salt.toString('base64'), 100000, 32, 'sha512');
             
-           
-            let signupUserQuery = "INSERT INTO user (user_id, user_pw, user_gender, user_age, user_height, user_weight, user_bmi, user_salt) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"; 
-            let signupUserResult = await db.queryParam_Arr(signupUserQuery, [user_id, hashedpw.toString('base64'), user_gender, user_age, user_height, user_weight, user_bmi, salt.toString('base64')]);
+            let signupUserQuery = "INSERT INTO user (user_id, user_pw, user_gender, user_age, user_height, user_weight, user_salt, user_bmi) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"; 
+            let signupUserResult = await db.queryParam_Arr(signupUserQuery, [user_id, hashedpw.toString('base64'), user_gender, user_age, user_height, user_weight, salt.toString('base64'), user_bmi]);
+
 
             if(!signupUserResult){ //쿼리 에러 
                 res.status(500).send({

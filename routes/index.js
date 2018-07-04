@@ -6,7 +6,9 @@ var router = express.Router();
 //   res.render('index', { title: 'Express' });
 // });
 
-router.use('/auth', require('./auth/index.js'))
-router.use('/user', require('./user/index.js'))
+router.use('/auth', require('./auth/index.js'));
+router.use('/user', require('./user/index.js'));
+router.use('/board', require('./board/index.js'));
+
 
 module.exports = router;
