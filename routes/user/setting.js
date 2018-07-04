@@ -10,8 +10,8 @@ router.put('/', async function(req, res){
     let user_desc = req.body.user_desc;
     let user_height =  req.body.user_height;
     let user_weight = req.body.user_weight;
-    let style_idx = req.body.style_idx;
-    let 
+    //let style_type = JSON.parse("["+req.body.style_type+"]");
+   
     
 
     //user_idx 없을시 오류 
@@ -21,9 +21,15 @@ router.put('/', async function(req, res){
         }); 
     }
     else {
-        let updateUserQuery = "UPDATE user SET user_desc = ?, user_age= ?, user_img = ?, user_height= ?, user_weight= ? WHERE user_idx = ?;";
+        let updateUserQuery = 'UPDATE user SET user_desc = ?, user_age= ?, user_img = ?, user_height= ?, user_weight= ? WHERE user_idx = ?';
         let updateUserResult = await db.queryParam_Arr(updateUserQuery, [user_desc, user_age, user_img, user_height, user_weight, user_idx]);
-    
+        /*
+        if(style_type){
+            let updateStyleQuery = 'DELETE FROM user_style WHERE user_idx = ? '
+            let updateStyleResult = await db.queryParam_Arr(updateStyleQuery, [user_idx]);
+        }
+        */
+
         //쿼리 에러
         if(!updateUserResult) {
             res.status(500).send({
@@ -40,7 +46,8 @@ router.put('/', async function(req, res){
                     user_age : user_age,
                     user_img : user_img,
                     user_height : user_height,
-                    user_weight : user_weight
+                    user_weight : user_weight,
+                    
                 }
             }); 
         }
