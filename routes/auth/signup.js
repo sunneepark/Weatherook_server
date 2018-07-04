@@ -10,9 +10,10 @@ router.post('/', async function(req, res){
     let user_pw = req.body.user_pw; 
     let user_gender = req.body.user_gender; 
     let user_age = req.body.user_age; 
-    let user_height = req.body.user_height; 
-    let user_weight = req.body.user_weight; 
+    let user_height = parseInt(req.body.user_height,10); 
+    let user_weight = parseInt(req.body.user_weight,10);
     
+    let user_bmi=user_weight/(user_height/100*user_height/100);
 
     //id 또는 pw 입력 오류 시
     if(!user_id || !user_pw){
@@ -39,8 +40,8 @@ router.post('/', async function(req, res){
             const salt = await crypto.randomBytes(32);
             const hashedpw = await crypto.pbkdf2(user_pw, salt.toString('base64'), 100000, 32, 'sha512');
             
-            let signupUserQuery = "INSERT INTO user (user_id, user_pw, user_gender, user_age, user_height, user_weight, user_salt) VALUES (?, ?, ?, ?, ?, ?, ?)"; 
-            let signupUserResult = await db.queryParam_Arr(signupUserQuery, [user_id, hashedpw.toString('base64'), user_gender, user_age, user_height, user_weight, salt.toString('base64')]);
+            let signupUserQuery = "INSERT INTO user (user_id, user_pw, user_gender, user_age, user_height, user_weight, user_salt, user_bmi) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"; 
+            let signupUserResult = await db.queryParam_Arr(signupUserQuery, [user_id, hashedpw.toString('base64'), user_gender, user_age, user_height, user_weight, salt.toString('base64'), user_bmi]);
 
             if(!signupUserResult){ //쿼리 에러 
                 res.status(500).send({
