@@ -252,6 +252,7 @@ router.delete('/', async function(req, res){
             }
         }
     }
-})
+});
+
 
 module.exports = router;
