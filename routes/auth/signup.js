@@ -12,7 +12,7 @@ router.post('/', async function(req, res){
     let user_age = req.body.user_age; 
     let user_height = req.body.user_height; 
     let user_weight = req.body.user_weight; 
-    console.log(user_id);
+    
 
     //id 또는 pw 입력 오류 시
     if(!user_id || !user_pw){
@@ -24,7 +24,7 @@ router.post('/', async function(req, res){
     else {
         let checkUserQuery = "SELECT * FROM user WHERE user_id = ?"
         let checkUserResult = await db.queryParam_Arr(checkUserQuery, user_id);
-        console.log(checkUserResult);
+
         if (!checkUserResult){ //쿼리 에러
             res.status(500).send({
                 message : "Internal Server Error1"
