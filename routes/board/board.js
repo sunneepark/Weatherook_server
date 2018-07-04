@@ -109,8 +109,6 @@ router.get('/:board_idx', async function(req, res){
         let selectOneBoardQuery = 'SELECT * FROM board WHERE board_idx = ?'; 
         let selectOneBoardResult = await db.queryParam_Arr(selectOneBoardQuery, [board_idx]); 
     
-<<<<<<< HEAD
-=======
         //user_idx를 가져오기 위한 user_board 테이블에 접근
         let selectWriterOneBoardQuery = 'SELECT * FROM user_board WHERE board_idx = ?'; 
         let selectWriterOneBoardResult = await db.queryParam_Arr(selectWriterOneBoardQuery, [board_idx]);
@@ -156,7 +154,6 @@ router.get('/:board_idx', async function(req, res){
         
         
         
->>>>>>> 5376e517f297d6887ce5ce579b20a073ba6e5c44
         //쿼리 에러
         if(!selectOneBoardResult) {
             res.status(500).send({
@@ -165,8 +162,6 @@ router.get('/:board_idx', async function(req, res){
         }
         //정상 수행
         else {
-<<<<<<< HEAD
-=======
             let data_res = {
                 user_idx : selectWriterOneBoardResult[0].user_idx, 
                 board_img : selectOneBoardResult[0].board_img,
@@ -177,7 +172,6 @@ router.get('/:board_idx', async function(req, res){
                 board_temp_max : selectOneBoardResult[0].board_temp_max,
                 board_weather : selectOneBoardResult[0].board_weather
             }
->>>>>>> 5376e517f297d6887ce5ce579b20a073ba6e5c44
             res.status(201).send({
                 message : "Successfully get One board", 
                 data : selectOneBoardResult
