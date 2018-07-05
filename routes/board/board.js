@@ -84,7 +84,7 @@ router.post('/',upload.single('board_img'), async function(req, res){
 
                 //hashtag 테이블에 게시글 해시태그 정보 삽입
                 for(var i=0;i<board_hashtag.length;i++){ //게시글과 해시태그 등록
-                    let searchhashtag="SELECT * FROM hashtag WHERE hashtag_desc=?";
+                    let searchhashtag="SELECT * FROM hashtag WHERE hashtag_desc=?";//기존에 해시태그 있는지
                     let searchhashtagresult=await db.queryParam_Arr(searchhashtag,board_hashtag[i]);
                     let hashtag_index;
                     if(!searchhashtagresult){
@@ -172,12 +172,11 @@ router.get('/:board_idx', async function(req, res){
         let selectLikesCntResult = await db.queryParam_Arr(selectLikesCnt, [board_idx]);
 
         //쿼리 에러
-        if(!selectOneBoardResult || !selectWriterOneBoardResult || !selectLikesCntResult) {
+        if(!selectOneBoardResult) {
             res.status(500).send({
                 message : "Internal Server Error"
             }); 
         }
-
         //정상 수행
         else {
             let data_res = {
@@ -192,7 +191,7 @@ router.get('/:board_idx', async function(req, res){
             }
             res.status(201).send({
                 message : "Successfully get One board", 
-                data : data_res
+                data : selectOneBoardResult
             }); 
         }
     }
@@ -222,37 +221,25 @@ router.delete('/', async function(req, res){
 
         //user_idx이 작성한 board 정보가 있는지 확인
         //user_board 에서 정보가 있는지 확인할 수 있다. 
-        console.log(user_idx);
-        let checkUserInBoardQuery = 'SELECT * FROM user_board WHERE user_idx = ? AND board_idx = ?';
-        let checkUserInBoardResult = await db.queryParam_Arr(checkUserInBoardQuery, [user_idx, board_idx]); 
+        let checkUserInBoardQuery = 'SELECT * FROM user_table WHERE user_idx = ? ';
+        let checkUserInBoardResult = await db.queryParam_Arr(checkUserInBoardQuery, [user_idx]); 
 
         if(!checkUserInBoardResult) {
             res.status(500).send({
-                message : "Internal Server Error1"
+                message : "Internal Server Error"
             }); 
         }
         else {
             //일치하면? 
-            if(checkUserInBoardResult[0].user_idx == decoded.user_idx){
+            if(!checkUserInBoardResult[0].user_idx == decoded.user_idx){
 
                 //board 테이블과 user_table 에서 한꺼번에 삭제하는 쿼리 
-                //let deleteUserBoardQuery = "DELETE FROM board INNER JOIN user_board WHERE board_idx = ?"; 
-                //let deleteUserBoardResult = await db.queryParam_Arr(deleteUserBoardQuery, [user_board, board_idx]); 
-                //는 실패해서 주석 처리 해버림 -_-ㅋ
+                let deleteBoardQuery = "DELETE FROM board INNER JOIN user_board WHERE board_idx = ?"; 
+                let deleteBoardResult = await db.queryParam_Arr(deleteBoardQuery, [board_idx]); 
 
-                //board 테이블에서 삭제하는 쿼리
-                let deleteBoardQuery = "DELETE FROM board WHERE board_idx = ?"; 
-                let deleteBoardResult = await db.queryParam_Arr(deleteBoardQuery, [board_idx]);
-                
-
-                //user_board 테이블에서 삭제하는 쿼리
-                let deleteUserInBoardQuery = "DELETE FROM user_board WHERE board_idx = ?";
-                let deleteUserInBoardResult = await db.queryParam_Arr(deleteUserInBoardQuery, [board_idx])
-                                 
-
-                if(!deleteBoardResult || !deleteUserInBoardResult){
+                if(!deleteBoardResult){
                     res.status(500).send({
-                        message : "Internal server Error2"
+                        message : "Internal server Error"
                     }); 
                 }
                 else {

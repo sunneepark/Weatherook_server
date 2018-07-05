@@ -35,7 +35,8 @@ router.post('/', async function(req, res){
             if(hashedpw.toString('base64') == checkUserResult[0].user_pw){
                 console.log(checkUserResult[0].user_idx); //checking result query 
                 //토큰 발급
-                let token = jwt.sign(checkUserResult[0].user_idx); 
+                let token = jwt.sign(checkUserResult[0].user_idx);
+                console.log(token); 
                 
                 res.status(201).send({
                     message : "Successfully sign in",
