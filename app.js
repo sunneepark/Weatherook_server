@@ -9,6 +9,10 @@ var usersRouter = require('./routes/users');
 var boardRouter = require('./routes/board')
 var app = express();
 
+//웹 연동
+var cors=require('cors');
+app.use(cors());
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
