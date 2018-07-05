@@ -9,6 +9,7 @@ var router = express.Router();
 router.use('/auth', require('./auth/index.js'));
 router.use('/user', require('./user/index.js'));
 router.use('/board', require('./board/index.js'));
+router.use('/weather', require('./weather/index.js'));
 
 
 module.exports = router;
