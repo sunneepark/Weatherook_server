@@ -17,11 +17,11 @@ router.post('/',upload.single('board_img'), async function(req, res){
     let board_auth = req.body.board_auth;
 
     let style_type = JSON.parse(req.body.style_type);
-    let board_hashtag = JSON.parse(req.body.board_hashtag);
+    //let board_hashtag = JSON.parse(req.body.board_hashtag);
     board_img = req.file.location; 
 
     // board_img 가 없을 때 
-    if(!req.file || !board_desc || !board_weather || !board_temp_max || !board_temp_min || !board_auth || !style_type || !board_hashtag){
+    if(!req.file || !board_desc || !board_weather || !board_temp_max || !board_temp_min || !board_auth || !style_type ){
         res.status(400).send({
             message : "Null Value"
         }); 
@@ -82,7 +82,7 @@ router.post('/',upload.single('board_img'), async function(req, res){
                     }  
                 }
 
-                //hashtag 테이블에 게시글 해시태그 정보 삽입
+                /*//hashtag 테이블에 게시글 해시태그 정보 삽입
                 for(var i=0;i<board_hashtag.length;i++){ //게시글과 해시태그 등록
                     let searchhashtag="SELECT * FROM hashtag WHERE hashtag_desc=?";//기존에 해시태그 있는지
                     let searchhashtagresult=await db.queryParam_Arr(searchhashtag,board_hashtag[i]);
@@ -102,7 +102,7 @@ router.post('/',upload.single('board_img'), async function(req, res){
                             message : "Internal Server Error, failed to insert hashtag"
                         }); 
                     }  
-                }
+                }*/
                
                 res.status(201).send({
                     message : "Successfully register",
