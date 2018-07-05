@@ -15,7 +15,7 @@ router.post('/', async function(req, res){
     let user_weight = parseInt(req.body.user_weight,10);
     
     let user_bmi=user_weight/(user_height/100*user_height/100);
-    let user_stylelist=JSON.parse("["+req.body.user_stylist+"]");
+    let user_stylelist=req.body.user_stylist;
 
     //id 또는 pw 입력 오류 시
     if(!user_id || !user_pw){
@@ -52,13 +52,12 @@ router.post('/', async function(req, res){
             }
             else{
                 checkUserResult = await db.queryParam_Arr(checkUserQuery, user_id);
-    
+                let userindex=parseInt(checkUserResult[0].user_idx,10);
                     for(var i=0;i<user_stylelist.length;i++){ //유저와 스타일 등록
                         let signupStyleQuery="SELECT style_idx FROM style WHERE style_type= ?";
                         let signupStyleResult = await db.queryParam_Arr(signupStyleQuery,user_stylelist[i]);
                         let styleindex=parseInt(signupStyleResult[0].style_idx,10);
-                        let userindex=parseInt(checkUserResult[0].user_idx,10);
-                       
+                    
                         let putStyleQuery="INSERT INTO user_style (user_idx , style_idx) VALUES (?, ?)";
                         let putStyleResult=await db.queryParam_Arr(putStyleQuery, [userindex ,styleindex]);
                         if(!signupStyleResult || !putStyleResult){ //쿼리 에러 
@@ -76,7 +75,8 @@ router.post('/', async function(req, res){
             
         }
     }
-}); 
+});  
+
 
 
 router.delete('/', async function(req, res){

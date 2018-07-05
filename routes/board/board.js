@@ -7,88 +7,109 @@ const jwt = require('../../module/jwt.js');
 
 
 //게시글 등록하기
-router.post('/', upload.single('board_img'), async function(req, res){
-    // Identifier 'token' has already been declared 라는 에러 때문에 선언부 let을 뺌
-    let user_idx = req.body.user_idx;
+router.post('/',upload.single('board_img'), async function(req, res){
+    
+    let token = req.headers.token;
     let board_desc = req.body.board_desc;
+    let board_weather=req.body.board_weather;
     let board_temp_min = req.body.board_temp_min;
     let board_temp_max = req.body.board_temp_max;
-    let board_auth = req.body.board_auth; 
-    let style_type = req.body.style_type; 
-    let token = req.headers.token;  
+    let board_auth = req.body.board_auth;
 
+    let style_type = JSON.parse(req.body.style_type);
+    //let board_hashtag = JSON.parse(req.body.board_hashtag);
     board_img = req.file.location; 
 
     // board_img 가 없을 때 
-    if(!req.file){
+    if(!req.file || !board_desc || !board_weather || !board_temp_max || !board_temp_min || !board_auth || !style_type ){
         res.status(400).send({
             message : "Null Value"
         }); 
     }else {
+        
         //토큰을 decoding
-        let decoded = jwt.verify(token);
-
+       let decoded = jwt.verify(token);
         //decoding 실패시
         if(decoded == -1){
             res.status(500).send({
                 message : "Token Error"
             });
         }
-        //title 또는 content 의 잘못된 입력
-        else if(!board_title || !board_content){
-            res.status(400).send({
-                message : "Null Value"
-            });
-        }
         //정상 수행 시
         else{
+           let user_idx = decoded.user_idx;
             //user 정보 확인
             let checkBoardQuery = 'SELECT * FROM user WHERE user_idx = ?'; 
             let checkBoardResult = await db.queryParam_Arr(checkBoardQuery, [user_idx]);
 
             if(!checkBoardResult){ // 쿼리 에러
-                res.status(500).send({
-                    message : "Internal Server Error"
+                res.status(400).send({
+                    message : "wrong user"
                 }); 
             }
-            //user 정보가 존재할 시
+            //user정보가 존재시에
             else {
-                user_idx = decoded.user_idx; 
-                
                 let board_date = moment().format('YYYY-MM-DD HH:mm:ss'); 
 
                 //board 테이블에 게시글 정보 삽입
                 let insertBoardQuery = 'INSERT INTO board (board_img, board_desc, board_temp_min, board_temp_max, board_weather, board_auth, board_date) VALUES (?, ?, ?, ?, ?, ?, ?)'; 
                 let insertBoardResult = await db.queryParam_Arr(insertBoardQuery, [board_img, board_desc, board_temp_min, board_temp_max, board_weather, board_auth, board_date]); 
                 
-                let last_board_idx_query = 'SELECT LAST_INSERT_ID()'; 
-                let last_board_idx = await db.queryParam_None(last_board_idx_query); 
+                let board_insert_index=insertBoardResult.insertId;
+                //user_board 테이블에 게시글 유저 정보 삽입
+                let insertUserQuery ='INSERT INTO user_board (board_idx, user_idx) VALUES (?,?)';
+                let insertUserResult = await db.queryParam_Arr(insertUserQuery, [board_insert_index,user_idx]);
 
-                //style 테이블에 키워드 정보 삽입
-                let insertStyleQuery = 'INSERT INTO style (style_type) VALUES (?)'; 
-                let insertStyleResult = await db.queryParam_Arr(insertStyleQuery, [style_type]);
-                
-                let last_style_idx_query = 'SELECT LAST_INSERT_ID()';
-                let last_style_idx = await db.queryParam_None(last_style_idx_query); 
-
-                //board_style 테이블에 게시글과 키워드 정보 삽입
-                let insertBoardStyleQuery = 'INSERT INTO board_style (board_idx, style_idx) VALUES (?, ?)';
-                let insertBoardStyleResult = await db.queryParam_Arr(insertBoardStyleQuery, [last_board_idx[0], last_style_idx[0]]); 
-
-
-                if(!insertBoardResult || !insertStyleResult || !insertBoardStyleResult){ //쿼리 에러
+                if(!insertBoardResult || !insertUserResult ){ //쿼리 에러
                     res.status(500).send({
                         message : "Internal Server Error"
                     }); 
                 }
-                //정상 수행 시 
-                else {
-                    res.status(201).send({
-                        message : "Successfully register",
-                        board_idx : last_board_idx[0]
-                    }); 
+                else{
+                //style 테이블에 게시글 스타일 정보 삽입
+                for(var i=0;i<style_type.length;i++){ //유저와 스타일 등록
+                    let signupStyleQuery="SELECT style_idx FROM style WHERE style_type= ?";
+                    
+                    let signupStyleResult = await db.queryParam_Arr(signupStyleQuery,style_type[i]);
+                    let styleindex=parseInt(signupStyleResult[0].style_idx,10);
+                  
+                    let putStyleQuery="INSERT INTO board_style (board_idx , style_idx) VALUES (?, ?)";
+                    let putStyleResult=await db.queryParam_Arr(putStyleQuery, [board_insert_index ,styleindex]);
+                    if(!signupStyleResult || !putStyleResult){ //쿼리 에러 
+                        res.status(500).send({
+                            message : "Internal Server Error, failed to insert style"
+                        }); 
+                    }  
                 }
-           }
+
+                /*//hashtag 테이블에 게시글 해시태그 정보 삽입
+                for(var i=0;i<board_hashtag.length;i++){ //게시글과 해시태그 등록
+                    let searchhashtag="SELECT * FROM hashtag WHERE hashtag_desc=?";//기존에 해시태그 있는지
+                    let searchhashtagresult=await db.queryParam_Arr(searchhashtag,board_hashtag[i]);
+                    let hashtag_index;
+                    if(!searchhashtagresult){
+                        let insertQuery="INSERT INTO hashtag (hashtag_desc) VALUES (?)";
+                        let insertResult = await db.queryParam_Arr(insertQuery,board_hashtag[i]);
+                        hashtag_index=insertResult.insertId;
+                    }
+                    else
+                        hashtag_index=searchhashtagresult[0].hashtag_idx;
+                    
+                    putStyleQuery="INSERT INTO board_hashtag (board_idx , hashtag_idx) VALUES (?, ?)";
+                    putStyleResult=await db.queryParam_Arr(putStyleQuery, [board_insert_index , hashtag_index]);
+                    if(!putStyleResult){ //쿼리 에러 
+                        res.status(500).send({
+                            message : "Internal Server Error, failed to insert hashtag"
+                        }); 
+                    }  
+                }*/
+               
+                res.status(201).send({
+                    message : "Successfully register",
+                    board_idx : board_insert_index
+                }); 
+            }
+            }
         }
     }
 }); 
@@ -151,6 +172,7 @@ router.get('/:board_idx', async function(req, res){
         let selectLikesCnt = 'SELECT count(*) as count FROM board_like WHERE board_idx = ?';
         let selectLikesCntResult = await db.queryParam_Arr(selectLikesCnt, [board_idx]);
 
+<<<<<<< HEAD
         //comment를 가져오기 위한 board_comment와 comment 테이블 접근
         let checkCommentInBoard = 'SELECT * FROM board_comment WHERE board_idx = ?'; 
         let checkCommentInBoardRes = await db.queryParam_Arr(checkCommentInBoard, [board_idx]); 
@@ -212,6 +234,8 @@ router.get('/:board_idx', async function(req, res){
         }
         
         
+=======
+>>>>>>> 21ea5aa25604d3fc77dce5920f1af72dfc605135
         //쿼리 에러
         if(!selectOneBoardResult) {
             res.status(500).send({
@@ -300,6 +324,5 @@ router.delete('/', async function(req, res){
         }
     }
 });
-
 
 module.exports = router;

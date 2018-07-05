@@ -26,7 +26,7 @@ router.post('/', async function(req, res){
             }); 
         }
         //사용자 정보가 존재(정상 수행)
-        else if(checkUserResult.length === 1){
+        else if(checkUserResult.length >0 ){
             //입력한 pw와 저장한 pw의 일치 여부 검사 
             let hashedpw = await crypto.pbkdf2(user_pw, checkUserResult[0].user_salt, 100000, 32, 'sha512');
             console.log(hashedpw.toString('base64'));
