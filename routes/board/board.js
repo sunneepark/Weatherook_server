@@ -120,7 +120,8 @@ router.get('/:board_idx', async function(req, res){
     let board_idx = req.params.board_idx; 
     
     //let hashtag_desc; 
-    let comment_arr = []; 
+    let comment_idx;
+    let comment_arr = {}; 
     //board_idx 게시글이 존재하는지 확인
     //board_idx 입력 오류 
     if(!board_idx){
@@ -177,23 +178,23 @@ router.get('/:board_idx', async function(req, res){
         let checkCommentInBoard = 'SELECT * FROM board_comment WHERE board_idx = ?'; 
         let checkCommentInBoardRes = await db.queryParam_Arr(checkCommentInBoard, [board_idx]); 
 
-        if(!checkCommentInBoardRes){
-            //쿼리 연결 에러
-            res.status(500).send({
-                message : "Internal Server Error"
-            }); 
-        }
-        else {
-            //쿼리 정상 수행
-            if (checkCommentInBoardRes == []){
-                //달린 comment가 없을 때
-                comment_arr = null; 
-            }
-            else {
-                //달린 comment가 존재할 때
+        // if(!checkCommentInBoardRes){
+        //     //쿼리 연결 에러
+        //     res.status(500).send({
+        //         message : "Internal Server Error"
+        //     }); 
+        // }
+        // else {
+        //     //쿼리 정상 수행
+        //     if (checkCommentInBoardRes == []){
+        //         //달린 comment가 없을 때
+        //         comment_arr = null; 
+        //     }
+        //     else {
+        //         //달린 comment가 존재할 때
                 
-            }
-        }
+        //     }
+        // }
         
         if(!checkCommentInBoardRes){
             res.status(500).send({
@@ -205,16 +206,21 @@ router.get('/:board_idx', async function(req, res){
                 comment_arr = null; 
             }
             else {//댓글이 존재할때 
+                console.log(checkCommentInBoardRes) //board_idx : 1, comment_idx : 1 }, {board_idx : 1, comment_idx : 2} 
+                console.log(checkCommentInBoardRes.length) //2
+                console.log(checkCommentInBoardRes[0].comment_idx) // 1
+                console.log(checkCommentInBoardRes[1].comment_idx) // 2
+                
                 for(var i=0; i<checkCommentInBoard.length; i++){
-                    let comment_idx = comment_idx.concat(checkCommentInBoardRes[i].comment_idx);
-                    
+                    comment_idx = checkCommentInBoardRes[i].comment_idx;
+                    console.log(comment_idx)
                     let getCommentInfo = 'SELECT * FROM comment WHERE comment_idx = ?';
-                    let getCommentInfoRes = await db.queryParam_Arr(getCommentInfo, [comment_idx[i]]);
-
+                    let getCommentInfoRes = await db.queryParam_Arr(getCommentInfo, [comment_idx]);
+                    console.log(getCommentInfoRes[0])
                     let user_idx = getCommentInfoRes[0].user_idx; //comment를 단 user ID
                     //user_idx로 user_id 가져오자
                     let getUserIdAsIdx = 'SELECT * FROM user WHERE user_idx = ?';
-                    let getUserIdAsIdxRes = await db.getUserIdAsIdx(getUserIdAsIdx, [user_idx]); 
+                    let getUserIdAsIdxRes = await db.queryParam_Arr(getUserIdAsIdx, [user_idx]); 
                     if(!getUserIdAsIdxRes){
                         res.status(500).send({
                             message : "Internal Server Error"
