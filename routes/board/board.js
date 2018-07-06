@@ -119,7 +119,7 @@ router.post('/',upload.single('board_img'), async function(req, res){
 router.get('/:board_idx', async function(req, res){
     let board_idx = req.params.board_idx; 
     
-    let hashtag_desc; 
+    //let hashtag_desc; 
     let comment_arr = []; 
     //board_idx 게시글이 존재하는지 확인
     //board_idx 입력 오류 
@@ -173,7 +173,6 @@ router.get('/:board_idx', async function(req, res){
         let selectLikesCnt = 'SELECT count(*) as count FROM board_like WHERE board_idx = ?';
         let selectLikesCntResult = await db.queryParam_Arr(selectLikesCnt, [board_idx]);
 
-<<<<<<< HEAD
         //comment를 가져오기 위한 board_comment와 comment 테이블 접근
         let checkCommentInBoard = 'SELECT * FROM board_comment WHERE board_idx = ?'; 
         let checkCommentInBoardRes = await db.queryParam_Arr(checkCommentInBoard, [board_idx]); 
@@ -235,8 +234,6 @@ router.get('/:board_idx', async function(req, res){
         }
         
         
-=======
->>>>>>> 21ea5aa25604d3fc77dce5920f1af72dfc605135
         //쿼리 에러
         if(!selectOneBoardResult) {
             res.status(500).send({
