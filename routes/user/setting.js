@@ -59,29 +59,34 @@ router.put('/', async function(req, res){
         let user_height =  req.body.user_height;
         let user_weight = req.body.user_weight;
         let user_gender = req.body.user_gender;
-        //let style_type = JSON.parse("["+req.body.style_type+"]");
-
+        let user_stylelist= JSON.parse(req.body.user_stylelist);
 
 
         let updateUserQuery = 'UPDATE user SET user_desc = ?,user_gender=?, user_age= ?, user_img = ?, user_height= ?, user_weight= ? WHERE user_idx = ?';
         let updateUserResult = await db.queryParam_Arr(updateUserQuery, [user_desc, user_gender, user_age, user_img, user_height, user_weight, user_idx]);
-        /*
-        if(style_type){
-            let updateStyleQuery = 'DELETE FROM user_style WHERE user_idx = ? '
-            let updateStyleResult = await db.queryParam_Arr(updateStyleQuery, [user_idx]);
-        }
-        */
+        
+       // if(user_stylelist){
 
-        //쿼리 에러
-        if(!updateUserResult) {
-            res.status(500).send({
-                message : "Internal Server Error"
-            }); 
-        }
-        //정상 수행
-        else {
+            let deleteUserStyle = 'DELETE FROM user_style WHERE user_idx = ?'
+            let deleteUserStyleResult = await db.queryParam_Arr(deleteUserStyle, [user_idx]);
+
+            for(var i=0;i<user_stylelist.length;i++){ //유저와 스타일 등록
+                let settingStyleQuery= "SELECT style_idx FROM style WHERE style_type= ?";
+                let settingStyleResult = await db.queryParam_Arr(settingStyleQuery,user_stylelist[i]);
+                let styleindex=parseInt(settingStyleResult[0].style_idx,10);
+
+                let updateStyleQuery="INSERT INTO user_style (user_idx, style_idx) VALUES(?,?)";
+                let updateStyleResult = await db.queryParam_Arr(updateStyleQuery,[user_idx, styleindex]);
+               // let styleindex=parseInt(settingStyleResult[0].style_idx,10);
+                if(!settingStyleResult || !updateStyleResult || !updateUserResult){ //쿼리 에러 
+                    res.status(500).send({
+                        message : "Internal Server Error, failed to insert style"
+                    }); 
+                }
+               
+            }
             res.status(201).send({
-                message : "Successfully user setting",
+                message : "Successfully Style Updated",
                 data : {
                     user_idx : user_idx,
                     user_desc : user_desc,
@@ -90,10 +95,11 @@ router.put('/', async function(req, res){
                     user_img : user_img,
                     user_height : user_height,
                     user_weight : user_weight,
+                    user_stylelist : user_stylelist
                     
                 }
-            }); 
-        }
+            });
+       // }
     }
 });
 
