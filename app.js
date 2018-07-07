@@ -3,15 +3,18 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+var helmet = require('helmet');
 
 var indexRouter = require('./routes/index');
 var userRouter = require('./routes/user');
 var boardRouter = require('./routes/board')
 var app = express();
 
+
 //웹 연동
 var cors=require('cors');
 app.use(cors());
+app.use(helmet());
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));

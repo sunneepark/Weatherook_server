@@ -6,7 +6,7 @@ const jwt = require('../../module/jwt.js');
 
 
 //개인 정보 보기
-router.get('/:user_idx', async function(req, res){
+router.get('/', async function(req, res){
     let token = req.headers.token; 
     let decoded = jwt.verify(token);
     
@@ -32,7 +32,6 @@ router.get('/:user_idx', async function(req, res){
             res.status(201).send({
                 message : "user show success",
                 data : {
-                    user_idx : user_idx,
                     showUserResult
                 }
             });
