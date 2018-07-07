@@ -71,7 +71,7 @@ router.put('/', async function (req, res) {
             }
         }
         res.status(400).send({
-            message: "검색 결과가 없습니다."
+            message: "팔로워 검색 결과가 없습니다."
         });
     }
 });
