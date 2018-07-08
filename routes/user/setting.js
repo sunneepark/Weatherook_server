@@ -43,7 +43,6 @@ router.get('/', async function(req, res){
 router.put('/', async function(req, res){
     let token = req.headers.token; 
     let decoded = jwt.verify(token);
-    //let style_type = JSON.parse("["+req.body.style_type+"]");
    
     //토큰 없을시 오류 
     if (decoded == -1){
@@ -65,7 +64,6 @@ router.put('/', async function(req, res){
         let updateUserQuery = 'UPDATE user SET user_desc = ?,user_gender=?, user_age= ?, user_img = ?, user_height= ?, user_weight= ? WHERE user_idx = ?';
         let updateUserResult = await db.queryParam_Arr(updateUserQuery, [user_desc, user_gender, user_age, user_img, user_height, user_weight, user_idx]);
         
-       // if(user_stylelist){
 
             let deleteUserStyle = 'DELETE FROM user_style WHERE user_idx = ?'
             let deleteUserStyleResult = await db.queryParam_Arr(deleteUserStyle, [user_idx]);
@@ -77,13 +75,12 @@ router.put('/', async function(req, res){
 
                 let updateStyleQuery="INSERT INTO user_style (user_idx, style_idx) VALUES(?,?)";
                 let updateStyleResult = await db.queryParam_Arr(updateStyleQuery,[user_idx, styleindex]);
-               // let styleindex=parseInt(settingStyleResult[0].style_idx,10);
+
                 if(!settingStyleResult || !updateStyleResult || !updateUserResult){ //쿼리 에러 
                     res.status(500).send({
                         message : "Internal Server Error, failed to insert style"
                     }); 
                 }
-               
             }
             res.status(201).send({
                 message : "Successfully Style Updated",
@@ -96,10 +93,8 @@ router.put('/', async function(req, res){
                     user_height : user_height,
                     user_weight : user_weight,
                     user_stylelist : user_stylelist
-                    
                 }
             });
-       // }
     }
 });
 

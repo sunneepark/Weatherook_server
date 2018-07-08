@@ -45,7 +45,7 @@ router.post('/',upload.single('board_img'), async function(req, res){
             if(!checkBoardResult){ // 쿼리 에러
                 res.status(400).send({
                     message : "wrong user"
-                }); 
+                });
             }
             //user정보가 존재시에
             else {
