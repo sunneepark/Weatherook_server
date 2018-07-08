@@ -10,7 +10,7 @@ router.get('/', async function(req, res){
     let decoded = jwt.verify(token);
     
     if (decoded == -1){
-        res.status(500).send({
+        res.status(400).send({
             message : "Token error"
         }); 
     }
@@ -30,7 +30,7 @@ router.get('/', async function(req, res){
         let showFolloingNum = 'SELECT COUNT(follower_idx) AS following FROM follow WHERE user_idx=?';
         let showFollogingNumResult = await db.queryParam_Arr(showFolloingNum, [user_idx]);
 
-        let showBoardAll = 'SELECT board_img, board_desc, board_date, board_weather, board_temp FROM board JOIN user_board  USING (board_idx) WHERE user_board.user_idx =?';
+        let showBoardAll = 'SELECT board_img, board_desc, board_date, board_weather, board_temp_min, board_temp_max FROM board JOIN user_board  USING (board_idx) WHERE user_board.user_idx =?';
         let showBoardAllResult = await db.queryParam_Arr(showBoardAll, [user_idx]);
 
         let showCommentInBoard = 'SELECT  board_idx FROM user_board where user_idx = ?';
@@ -47,11 +47,10 @@ router.get('/', async function(req, res){
             }
             else{
                 res.status(201).send({
-                    message : "show Comment success",
+                    message : "show Personal Board Img success",
                     data:{
                     showUserPageResult,
                     showBoardNumResult,
-                    showBoardAllResult,
                     showFollowerNumResult,
                     showFollogingNumResult,
                     showBoardAllResult,
