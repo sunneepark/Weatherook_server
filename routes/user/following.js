@@ -24,7 +24,6 @@ router.get('/', async function (req, res) {
             });
         }
         else{
-            console.log(showFollowingingIDResult);
             res.status(201).send({
                 message : "User Following ID success",
                 data : {

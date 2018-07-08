@@ -8,7 +8,7 @@ router.get('/', async function (req, res) {
     let decoded = jwt.verify(token);
     
     if (decoded == -1){
-        res.status(500).send({
+        res.status(400).send({
             message : "Token error"
         }); 
     }
