@@ -44,10 +44,8 @@ module.exports={
         }catch(e){
         }
         xml2js.parseString(response.body, function(err, obj) {
-            console.log(obj.wid.body[0].data);
             result=obj.wid.body[0].data;
         });
-        console.log(result);
         return result;
     },
     getKoreanWeather : async function(top, mid, leaf, callback) {

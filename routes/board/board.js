@@ -21,7 +21,6 @@ router.post('/',upload.single('board_img'), async function(req, res){
     
     board_weather=weather[0].wfKor[0];
     board_temp=parseInt(weather[0].temp);
-    
     let board_auth = req.body.board_auth;
     let style_type = JSON.parse(req.body.board_stylelist);
     //let board_hashtag = JSON.parse(req.body.board_hashtag);
@@ -60,7 +59,7 @@ router.post('/',upload.single('board_img'), async function(req, res){
                 let board_date = moment().format('YYYY-MM-DD HH:mm:ss'); 
                 
                 //board 테이블에 게시글 정보 삽입
-                let insertBoardQuery = 'INSERT INTO board (board_img, board_desc, board_temp, board_weather, board_auth, board_date, writer_id) VALUES (?, ?, ?, ?, ?, ?, ?)'; 
+                let insertBoardQuery = 'INSERT INTO board (board_img, board_desc, board_temp_min, board_weather, board_auth, board_date, writer_id) VALUES (?, ?, ?, ?, ?, ?, ?)'; 
                 let insertBoardResult = await db.queryParam_Arr(insertBoardQuery, [board_img, board_desc, board_temp, board_weather, board_auth, board_date,user_id]); 
                
                 let board_insert_index=insertBoardResult.insertId;
