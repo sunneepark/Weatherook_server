@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const db = require('../../module/pool.js');
 const jwt = require('../../module/jwt.js');
-
+const upload = require('../../config/multer.js');
 
 
 //개인 정보 보기
@@ -40,7 +40,7 @@ router.get('/', async function(req, res){
 })
 
 //개인 정보 수정
-router.put('/', async function(req, res){
+router.put('/', upload.array('user_img'), async function(req, res){
     let token = req.headers.token; 
     let decoded = jwt.verify(token);
    
@@ -53,7 +53,7 @@ router.put('/', async function(req, res){
     else {
         let user_idx = decoded.user_idx;
         let user_age = req.body.user_age;
-        let user_img = req.body.user_img;
+        let user_img = req.files[0].location;
         let user_desc = req.body.user_desc;
         let user_height =  req.body.user_height;
         let user_weight = req.body.user_weight;
