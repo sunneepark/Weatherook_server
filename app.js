@@ -7,7 +7,7 @@ var helmet = require('helmet');
 
 var indexRouter = require('./routes/index');
 var userRouter = require('./routes/user');
-var boardRouter = require('./routes/board')
+var boardRouter = require('./routes/board');
 var app = express();
 
 
