@@ -52,7 +52,7 @@ router.post('/',upload.single('board_img'), async function(req, res){
             if(!checkBoardResult){ // 쿼리 에러
                 res.status(400).send({
                     message : "wrong user"
-                }); 
+                });
             }
             //user정보가 존재시에
             else {
@@ -126,7 +126,9 @@ router.post('/',upload.single('board_img'), async function(req, res){
 router.get('/:board_idx', async function(req, res){
     let board_idx = req.params.board_idx; 
     
-    let hashtag_desc; 
+    //let hashtag_desc; 
+    let comment_idx;
+    let comment_arr = []; 
     //board_idx 게시글이 존재하는지 확인
     //board_idx 입력 오류 
     if(!board_idx){
@@ -142,64 +144,70 @@ router.get('/:board_idx', async function(req, res){
         let selectWriterOneBoardQuery = 'SELECT * FROM user_board WHERE board_idx = ?'; 
         let selectWriterOneBoardResult = await db.queryParam_Arr(selectWriterOneBoardQuery, [board_idx]);
 
-        //hashtag_desc를 가져오기 위한 hashtag 테이블과 board_hashtag 테이블에 접근
-        let checkHashtagInBoard = 'SELECT * FROM board_hashtag WHERE board_idx = ?'; 
-        let checkHashtagInBoardRes = await db.queryParam_Arr(checkHashtagInBoard, [board_idx]);
-        if(!checkHashtagInBoardRes){
-            res.status(500).send({
-                message : "Internal Server Error"
-            }); 
-        }
-        else {
-            //hashtag가 존재하지 않을 때, 
-            if(checkHashtagInBoardRes[0] == null)
-            {
-                hashtag_desc = null; 
-            }
-            else {
-                let getHashtagDesc = 'SELECT * FROM hashtag WHERE board_idx = ?'; 
-                let getHashtagDescRes = await db.queryParam_Arr(getHashtagDesc, [board_idx]);
-
-                if(!getHashtagDescRes){
-                    res.status(500).send({
-                        message : "Internal Server Error"
-                    }); 
-                    return; 
-                }
-
-                else {
-                    hashtag_desc = getHashtagDescRes[0].hashtag_desc; 
-                }
-            }
-        }
-
-
+        
 
         //like_cnt를 가져오기 위한 board_like와 like 테이블 접근
         let selectLikesCnt = 'SELECT count(*) as count FROM board_like WHERE board_idx = ?';
         let selectLikesCntResult = await db.queryParam_Arr(selectLikesCnt, [board_idx]);
 
+        //comment를 가져오기 위한 board_comment와 comment 테이블 접근
+        let checkCommentInBoard = 'SELECT * FROM board_comment WHERE board_idx = ?'; 
+        let checkCommentInBoardRes = await db.queryParam_Arr(checkCommentInBoard, [board_idx]); 
+
+        if(!checkCommentInBoardRes){
+            res.status(500).send({
+                message : "Internal Server Error"
+            }); 
+        }
+        else {
+            if(checkCommentInBoardRes.length == 0){
+                //댓글이 없음
+                comment_arr = null; 
+            }
+            else {
+                //댓글이 있음
+                let getCommentInfo = 'SELECT * FROM comment WHERE comment_idx = ?'; 
+                let getCommentInfoRes
+                for (var i=0; i<checkCommentInBoardRes.length; i++){
+                    comment_idx = checkCommentInBoardRes[i].comment_idx; 
+                    getCommentInfoRes = await db.queryParam_Arr(getCommentInfo, [comment_idx]); 
+                    if(!getCommentInfoRes){
+                        res.status(500).send({
+                            mesasge : "Internal Server Error"
+                        }); 
+                    }
+                    else {
+                        comment_arr = comment_arr.concat(getCommentInfoRes); 
+                    }
+                }
+            }
+        }
+        console.log("comment_arr : ", comment_arr);
+        
         //쿼리 에러
         if(!selectOneBoardResult) {
             res.status(500).send({
                 message : "Internal Server Error"
             }); 
         }
+
         //정상 수행
         else {
+            selectOneBoardResult[0].board_date
             let data_res = {
                 user_idx : selectWriterOneBoardResult[0].user_idx, 
                 board_img : selectOneBoardResult[0].board_img,
                 board_desc : selectOneBoardResult[0].board_desc, 
-                hashtag_desc : hashtag_desc, 
+                //hashtag_desc : hashtag_desc, 
                 like_cnt : selectLikesCntResult[0].count, 
                 board_temp_min : selectOneBoardResult[0].board_temp_min, 
                 board_temp_max : selectOneBoardResult[0].board_temp_max,
-                board_weather : selectOneBoardResult[0].board_weather
+                board_weather : selectOneBoardResult[0].board_weather,
+                comment_info : comment_arr
             }
             res.status(201).send({
                 message : "Successfully get One board", 
-                data : selectOneBoardResult
+                data : data_res
             }); 
         }
     }
