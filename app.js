@@ -6,7 +6,7 @@ var logger = require('morgan');
 
 var indexRouter = require('./routes/index');
 var userRouter = require('./routes/user');
-var boardRouter = require('./routes/board')
+var boardRouter = require('./routes/board');
 var app = express();
 
 //웹 연동

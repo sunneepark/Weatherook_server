@@ -9,7 +9,3 @@ router.use('/follower', require('./follower.js'));
 router.use('/following', require('./following.js'));
 
 module.exports = router;
-
-
-
-
