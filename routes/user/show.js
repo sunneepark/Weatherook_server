@@ -37,43 +37,29 @@ router.get('/', async function(req, res){
         let showCommentInBoardResult = await db.queryParam_Arr(showCommentInBoard, [user_idx]);
 
         for(var i=0; i<showCommentInBoardResult.length; i++){
-            let showBoardComment = 'SELECT comment_desc FROM comment JOIN board_comment USING(comment_idx) where board_idx = ?';
+            let showBoardComment = 'SELECT comment_desc, comment_id FROM comment JOIN board_comment USING(comment_idx) where board_idx = ?';
             let showBoardCommentResult = await db.queryParam_Arr(showBoardComment, [showCommentInBoardResult[0].board_idx]);
 
-            console.log(showCommentInBoardResult.length);
-            
-            if(!showBoardCommentResult){
+            if(!showBoardCommentResult|| !showUserPageResult || !showBoardNumResult || !showFollowerNumResult || !showFollogingNumResult || !showBoardAllResult || !showCommentInBoardResult ){
                 res.status(500).send({
                     message : "Internal Server Error" 
                 });
             }
             else{
-                const BoardC = new Array();
-                BoardC[i] = showBoardCommentResult[i].comment_desc;
-                console.log(BoardC[i]);
+                res.status(201).send({
+                    message : "show Comment success",
+                    data:{
+                    showUserPageResult,
+                    showBoardNumResult,
+                    showBoardAllResult,
+                    showFollowerNumResult,
+                    showFollogingNumResult,
+                    showBoardAllResult,
+                    showBoardCommentResult
+                    }
+                });
             }
         }
-        if(!showUserPageResult || !showBoardNumResult || !showFollowerNumResult || !showFollogingNumResult || !showBoardAllResult || !showCommentInBoardResult ){
-            res.status(500).send({
-                message : "Internal Server Error" 
-            });
-        }
-        else{
-            res.status(201).send({
-                message : "show Comment success",
-                data:{
-                showUserPageResult,
-                showBoardNumResult,
-                showBoardAllResult,
-                showFollowerNumResult,
-                showFollogingNumResult,
-                showBoardAllResult,
-                board_comment : BoardC[0].comment_desc
-                }
-            });
-        }
-
-
     }
 });
 
