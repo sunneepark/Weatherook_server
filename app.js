@@ -6,7 +6,8 @@ var logger = require('morgan');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
-var boardRouter = require('./routes/board')
+var boardRouter = require('./routes/board');
+var weatherRouter = require('./routes/weather');
 var app = express();
 
 //웹 연동
@@ -26,6 +27,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/board', boardRouter);
+app.use('/weather', weatherRouter);
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));
