@@ -27,8 +27,8 @@ router.post('/', async function(req, res){
         
         let user_idx = decoded.user_idx;
         
-        let insertComment = 'INSERT INTO comment (comment_desc) VALUES (?)'; 
-        let insertCommentRes = await db.queryParam_Arr(insertComment, [comment_desc]);
+        let insertComment = 'INSERT INTO comment (comment_desc, comment_id) VALUES(?, (SELECT user_id FROM user WHERE user_idx= ?));'; 
+        let insertCommentRes = await db.queryParam_Arr(insertComment, [comment_desc, user_idx]);
         if(!insertCommentRes){
             res.status(500).send({
                 mesasge : "Internal Server Error"
@@ -39,7 +39,7 @@ router.post('/', async function(req, res){
             let insertCommentUser = 'INSERT INTO user_comment (comment_idx, user_idx) VALUES (?, ?)';
             let insertCommentBoard = 'INSERT INTO board_comment (comment_idx, board_idx) VALUES (?, ?)'; 
             let insertCommentUserRes = await db.queryParam_Arr(insertCommentUser, [comment_idx, user_idx]);
-            let insertCommentBoardRes = await db.queryParam_Arr(insertCommentBoard, [comment_idx, board_idx]); 
+            let insertCommentBoardRes = await db.queryParam_Arr(insertCommentBoard, [comment_idx, board_idx, ]); 
             if(!insertCommentUserRes || !insertCommentBoardRes){
                 res.status(500).send({
                     message : "Internal Server Error"
