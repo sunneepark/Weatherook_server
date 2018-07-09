@@ -147,7 +147,7 @@ router.delete('/', async function(req, res){
 
         if(!checkCmtInBoardRes){
             res.status(500).send({
-                mesage : "Internsal Server Error1"
+                mesage : "Internsal Server Error"
             }); 
         }
         else if(checkCmtInBoardRes.length == 0){ //삭제할 코멘트가 게시글에 달려있지 않을때!
@@ -162,7 +162,7 @@ router.delete('/', async function(req, res){
     
             if(!checkUserInCmtRes){
                 res.status(500).send({
-                    message : "Internal Server Error2"
+                    message : "Internal Server Error"
                 }); 
             }
             else if(checkUserInCmtRes.length == 0){
@@ -176,7 +176,7 @@ router.delete('/', async function(req, res){
     
                 if(!delCmtInfoRes){
                     res.status(500).send({
-                        message : "Internal Server Error3"
+                        message : "Internal Server Error"
                     }); 
                 }
                 else {
@@ -191,6 +191,13 @@ router.delete('/', async function(req, res){
 
 router.get('/:board_idx', async function(req, res){
     let board_idx = req.params.board_idx; 
+
+    if(!board_idx){
+        res.status(400).send({
+            message : "Null Value"
+        }); 
+        return;
+    }
 
     let comment_arr = []; 
     //comment를 가져오기 위한 board_comment와 comment 테이블 접근
@@ -224,16 +231,9 @@ router.get('/:board_idx', async function(req, res){
         }
     }
 
-    let data_res = {
-        user_id : getCommentInfoRes[0].writer_id,
-        comment_desc : getCommentInfoRes[0].comment_desc,
-        comment_date : getCommentInfoRes[0].comment_date, 
-        user_img : getCommentInfoRes[0].user_img
-    }
-
     res.status(200).send({
         message : "Successfully get comment list",
-        data : data_res
+        data : comment_arr
     });
 })
 
