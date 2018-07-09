@@ -27,8 +27,12 @@ router.post('/', async function(req, res){
         
         let user_idx = decoded.user_idx;
         
-        let insertComment = 'INSERT INTO comment (comment_desc) VALUES (?)'; 
-        let insertCommentRes = await db.queryParam_Arr(insertComment, [comment_desc]);
+        //get user_id in user table
+        let getUserId = 'SELECT * FROM user WHERE user_idx = ?'; 
+        let getUserIdRes = await db.queryParam_Arr(getUserId, [user_idx]); 
+
+        let insertComment = 'INSERT INTO comment (comment_desc, comment_id) VALUES (?, ?)'; 
+        let insertCommentRes = await db.queryParam_Arr(insertComment, [comment_desc, getUserIdRes[0].user_id]);
         if(!insertCommentRes){
             res.status(500).send({
                 mesasge : "Internal Server Error"
@@ -186,6 +190,54 @@ router.delete('/', async function(req, res){
             }   
         }
     }
+}); 
+
+router.get('/:board_idx', async function(req, res){
+    let board_idx = req.params.board_idx; 
+
+    let comment_arr = []; 
+    //comment를 가져오기 위한 board_comment와 comment 테이블 접근
+    let checkCmtInBoard = 'SELECT * FROM board_comment WHERE board_idx = ?'; 
+    let checkCmtInBoardRes = await db.queryParam_Arr(checkCmtInBoard, [board_idx]); 
+
+    if(!checkCmtInBoardRes){
+        res.status(500).send({
+            message : "Internal Server Error"
+        }); 
+    }
+    else if(checkCmtInBoardRes.length == 0){
+        //댓글이 없음
+        comment_arr = null; 
+    }
+    else {
+        //댓글이 있음
+        let getCommentInfo = 'SELECT * FROM comment c, (SELECT user_img FROM user u, board b WHERE u.user_id = b.writer_id) u WHERE comment_idx = ?'; 
+        let getCommentInfoRes;
+        for (var i=0; i<checkCmtInBoardRes.length; i++){
+            comment_idx = checkCmtInBoardRes[i].comment_idx; 
+            getCommentInfoRes = await db.queryParam_Arr(getCommentInfo, [comment_idx]); 
+            if(!getCommentInfoRes){
+                res.status(500).send({
+                    message : "Internal Server Error"
+                });
+            }
+            else {
+                comment_arr = comment_arr.concat(getCommentInfoRes[0]); 
+            }
+        }
+    }
+
+    let data_res = {
+        user_id : getCommentInfoRes[0].writer_id,
+        comment_desc : getCommentInfoRes[0].comment_desc,
+        comment_date : getCommentInfoRes[0].comment_date, 
+        user_img : getCommentInfoRes[0].user_img
+    }
+
+    res.status(200).send({
+        message : "Successfully get comment list",
+        data : data_res
+    });
 })
 
 module.exports = router; 
