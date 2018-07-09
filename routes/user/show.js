@@ -10,7 +10,7 @@ router.get('/', async function(req, res){
     let decoded = jwt.verify(token);
     
     if (decoded == -1){
-        res.status(500).send({
+        res.status(400).send({
             message : "Token error"
         }); 
     }
@@ -33,27 +33,32 @@ router.get('/', async function(req, res){
         let showBoardAll = 'SELECT board_img, board_desc, board_date, board_weather, board_temp_min, board_temp_max FROM board JOIN user_board  USING (board_idx) WHERE user_board.user_idx =?';
         let showBoardAllResult = await db.queryParam_Arr(showBoardAll, [user_idx]);
 
-        if(!showUserPageResult || !showBoardNumResult || !showFollowerNumResult || !showFollogingNumResult || !showBoardAllResult){
-            res.status(500).send({
-                message : "Internal Server Error"
-            });
-        }
-        
-        else{
-            res.status(201).send({
-                message : "user persnoal show success",
-                data: {
+        let showCommentInBoard = 'SELECT  board_idx FROM user_board where user_idx = ?';
+        let showCommentInBoardResult = await db.queryParam_Arr(showCommentInBoard, [user_idx]);
+
+        for(var i=0; i<showCommentInBoardResult.length; i++){
+            let showBoardComment = 'SELECT comment_desc, comment_id FROM comment JOIN board_comment USING(comment_idx) where board_idx = ?';
+            let showBoardCommentResult = await db.queryParam_Arr(showBoardComment, [showCommentInBoardResult[0].board_idx]);
+
+            if(!showBoardCommentResult|| !showUserPageResult || !showBoardNumResult || !showFollowerNumResult || !showFollogingNumResult || !showBoardAllResult || !showCommentInBoardResult ){
+                res.status(500).send({
+                    message : "Internal Server Error" 
+                });
+            }
+            else{
+                res.status(201).send({
+                    message : "show Personal Board Img success",
+                    data:{
                     showUserPageResult,
                     showBoardNumResult,
-                    showBoardAllResult,
                     showFollowerNumResult,
                     showFollogingNumResult,
-                    showBoardAllResult
-                   
-                }
-            });
+                    showBoardAllResult,
+                    showBoardCommentResult
+                    }
+                });
+            }
         }
-
     }
 });
 
