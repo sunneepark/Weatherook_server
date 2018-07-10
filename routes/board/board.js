@@ -167,7 +167,7 @@ router.get('/:board_idx', async function(req, res){
             let getUserIdRes = await db.queryParam_Arr(getUserId, [selectWriterOneBoardResult[0].user_idx]);
             
             let getUserImg = 'SELECT user_img FROM user WHERE user_id = ?';
-            let getUserImgRes
+            let getUserImgRes;
             if(!getUserIdRes){
                 res.status(500).send({
                     message : "Internal Server Error1"
