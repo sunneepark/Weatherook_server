@@ -15,10 +15,10 @@ router.get('/', async function (req, res) {
     else{
         let user_idx = decoded.user_idx;
 
-        let showFollowingingID = 'SELECT user_id, user_img, user_desc FROM user JOIN follow ON user.user_idx = follow.follower_idx WHERE follow.user_idx = ?';
-        let showFollowingingIDResult = await db.queryParam_Arr(showFollowingingID, [user_idx]);
+        let showFollowingID = 'SELECT user_id, user_img, user_desc FROM user JOIN follow ON user.user_idx = follow.follower_idx WHERE follow.user_idx = ?';
+        let showFollowingIDResult = await db.queryParam_Arr(showFollowingID, [user_idx]);
 
-        if(!showFollowingingIDResult){
+        if(!showFollowingIDResult){
             res.status(500).send({
                 message : "Internal Server Error"
             });
@@ -27,7 +27,7 @@ router.get('/', async function (req, res) {
             res.status(201).send({
                 message : "User Following ID success",
                 data : {
-                    showFollowingingIDResult,
+                    showFollowingIDResult,
                 }
             });
         }
