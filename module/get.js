@@ -36,6 +36,42 @@ var http_get = function(url, data, callback) {
 // 한국 도시와 법정동을 사용해 X, Y 좌표 구한다.
 // top : 도, mid : 시/군/구, leaf : 읍/면/동
 module.exports={
+    weather_get : async function(type_, weather_,flag){ //flag가 0이면 맑음 -> 0 / 1이면 0->맑음
+        let type;
+        let weather;
+        if(flag==0){
+            if(weather_=='맑음') type=0;
+            else if(weather_=='구름 조금') type=1;
+            else if(weather_=='구름 많음') type=2;
+            else if(weather_=='흐림') type=3;
+            else if(weather_=='비') type=4;
+            else if(weather_=='눈/비') type=5;
+            else if(weather_=='눈') type=6;
+            return type;
+        }
+        else if(flag==1){
+            if(type_==0) weather='맑음';
+            else if(type_==1) weather='구름 조금';
+            else if(type_==2) weather='구름 많음';
+            else if(type_==3) weather='흐림';
+            else if(type_==4) weather='비';
+            else if(type_==5) weather='눈/비';
+            else if(type_==6) weather=='눈';
+            return weather;
+        }
+    },
+    type_get :async function(x,y){
+        let loc_type;
+        if(x>=61){
+            if(y<=125) loc_type=0;
+            else loc_type=3;
+        }
+        else{
+            if(y<=125) loc_type=1;
+            else loc_type=2;
+        }
+        return loc_type;
+    },
     http_gets : async function(x, y){
         var response;
         var result;

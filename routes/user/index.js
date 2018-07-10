@@ -7,5 +7,6 @@ router.use('/follow', require('./follow.js'));
 router.use('/show', require('./show.js'));
 router.use('/follower', require('./follower.js'));
 router.use('/following', require('./following.js'));
+router.use('/news', require('./news.js'));
 
 module.exports = router;

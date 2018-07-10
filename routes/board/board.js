@@ -1,33 +1,31 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../../module/pool.js'); 
-const upload = require('../../config/multer.js'); 
-const moment = require('moment');
+const upload = require('../../config/multer.js');
 const jwt = require('../../module/jwt.js');
-const get = require('../../module/get.js');
 
 //게시글 등록하기
 router.post('/',upload.single('board_img'), async function(req, res){
     
     let token = req.headers.token;
     let board_desc = req.body.board_desc;
-    let x=req.body.x;
-    let y=req.body.y;
-    let board_weather;
-    let board_temp;
-    let weather;
-
-    weather= await get.http_gets(x,y);
     
-    board_weather=weather[0].wfKor[0];
-    board_temp=parseInt(weather[0].temp);
+    //let board_weather=req.body.board_weather;
+    let board_temp_min=req.body.board_weather_min;
+    let board_temp_max=req.body.board_temp_max;
     let board_auth = req.body.board_auth;
-    let style_type = JSON.parse(req.body.board_stylelist);
+    let style_type = req.body.board_stylelist;
+    let board_date=req.body.board_date; //글 등록시간
     //let board_hashtag = JSON.parse(req.body.board_hashtag);
     board_img = req.file.location; 
 
+    
+    //weather= await get.http_gets(x,y);
+    //board_weather=weather[0].wfKor[0];
+    //board_temp=parseInt(weather[0].temp);
+
     // board_img 가 없을 때 
-    if(!req.file || !board_desc  || !board_auth || !style_type  ){
+    if(!req.file || !board_desc  || !board_auth || !style_type || !token ){
         res.status(400).send({
             message : "Null Value"
         }); 
@@ -56,11 +54,11 @@ router.post('/',upload.single('board_img'), async function(req, res){
             //user정보가 존재시에
             else {
                 let user_id=checkBoardResult[0].user_id;
-                let board_date = moment().format('YYYY-MM-DD HH:mm:ss'); 
+                //let board_date = moment().format('YYYY-MM-DD HH:mm:ss'); 
                 
                 //board 테이블에 게시글 정보 삽입
-                let insertBoardQuery = 'INSERT INTO board (board_img, board_desc, board_temp_min, board_weather, board_auth, board_date, writer_id) VALUES (?, ?, ?, ?, ?, ?, ?)'; 
-                let insertBoardResult = await db.queryParam_Arr(insertBoardQuery, [board_img, board_desc, board_temp, board_weather, board_auth, board_date,user_id]); 
+                let insertBoardQuery = 'INSERT INTO board (board_img, board_desc, board_temp_min, board_temp_max, board_weather, board_auth, board_date, writer_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)'; 
+                let insertBoardResult = await db.queryParam_Arr(insertBoardQuery, [board_img, board_desc, board_temp_min, board_temp_max, board_weather, board_auth, board_date,user_id]); 
                
                 let board_insert_index=insertBoardResult.insertId;
                 //user_board 테이블에 게시글 유저 정보 삽입
