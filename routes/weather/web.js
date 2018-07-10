@@ -66,19 +66,19 @@ router.get('/', async function(req, res){
     }
     else{
         let data_res = {
+            user_img :checkBoardResult[0].user_img,
             date_type:date_type,
             current_weather:current_weather,
             current_temp:current_temp,
             current_pop:current_pop,
             current_reh:current_reh,
-            temp_af:checkweatherResult[0].temp_min,
-            temp_am:checkweatherResult[0].temp_max,
+            temp_am:checkweatherResult[0].temp_min,
+            temp_af:checkweatherResult[0].temp_max,
             weather_af:await get.weather_get(checkweatherResult[0].weather_af,0,1),
             weather_am:await get.weather_get(checkweatherResult[0].weather_am,0,1)
         }
         res.status(201).send({
             message:"successfully get weather",
-            user_img :checkBoardResult[0].user_img,
             data : data_res
         });
     }
