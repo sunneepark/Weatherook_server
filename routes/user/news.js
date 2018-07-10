@@ -71,7 +71,7 @@ router.post('/', async function(req, res, next) {
             }
             for(var i=0;i<news_arr.length;i++){
                 for(var j=1;j<news_arr.length-1;j++){
-                    if(moment(news_arr[j].date,"YYYY-MM-DDTHH:mm.000Z").diff(moment(news_arr[j+1].date,"YYYY-MM-DDTHH:mm.000Z"))<0){
+                    if(moment(news_arr[j].date,"MM-DD").diff(moment(news_arr[j+1].date,"MM-DD"))<0){
                         var temp=news_arr[j];
                         news_arr[j]=news_arr[j+1];
                         news_arr[j+1]=temp;

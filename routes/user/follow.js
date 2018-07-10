@@ -48,7 +48,7 @@ router.post('/', async function(req, res){
             }
         }
         else{
-            let follow_date = moment().format('YYYY-MM-DD HH:mm:ss'); 
+            let follow_date = moment().format('MM-DD'); 
         
             putfollowQuery="INSERT INTO follow (follow_date, user_idx , follower_idx) VALUES (?, ?, ?)";
             putStyleResult=await db.queryParam_Arr(putfollowQuery, [follow_date, user_index ,follower_index]);

@@ -4,7 +4,7 @@ const db = require('../../../module/pool.js');
 const moment = require('moment');
 
 router.get('/', async function(res, res){
-    let board_date = moment().format('YYYY-MM-DD HH:mm:ss');
+    let board_date = moment().format('MM-DD');
     let board_day = moment().format('2018-07-01');
 
     let start_day = board_day.concat(' 00:00:00'); 
