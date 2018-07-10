@@ -28,6 +28,7 @@ module.exports = {
     }catch(err){
       next(err); 
     }finally{
+      connection.release();
       return result; 
     }
   }

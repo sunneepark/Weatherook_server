@@ -13,6 +13,7 @@ router.get('/', async function(req, res){
         res.status(400).send({
             message : "Token error"
         }); 
+        connection.release();
     }
     else{ 
         let comment_arr = [3];
