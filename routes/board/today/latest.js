@@ -1,9 +1,11 @@
 var express = require('express');
 var router = express.Router();
+const db = require('../../../module/pool.js'); 
+const moment = require('moment');
 
 router.get('/', async function(res, res){
     let board_date = moment().format('YYYY-MM-DD HH:mm:ss');
-    let board_day = moment().format('YYYY-MM-DD');
+    let board_day = moment().format('2018-07-01');
 
     let start_day = board_day.concat(' 00:00:00'); 
     let end_day = board_day.concat(' 23:59:59');
@@ -24,7 +26,7 @@ router.get('/', async function(res, res){
         }); 
     }
     else {
-        
+        console.log(getTodayBoardRes)
     }
 })
 
