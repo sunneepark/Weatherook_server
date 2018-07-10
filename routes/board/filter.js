@@ -34,7 +34,7 @@ router.post('/',upload.single('board_img'), async function(req, res){
     let style=JSON.parse(req.body.stylelist);
     let temp=parseInt(req.body.temp);
     let weather=req.body.weather;
-    let checkBoardQuery = 'SELECT board_idx FROM board WHERE ? between board_temp_min and board_temp_max and board_weather = ? and board_idx in (SELECT board_idx from user_board where user_idx in (SELECT user_idx FROM user WHERE user_bmi BETWEEN ? and ? and user_gender = ? and user_height between ? and ?))';
+    let checkBoardQuery = 'SELECT board_idx FROM board WHERE ? between board_temp_min and board_temp_max and board_weather = ? and board_auth=\'public\' and board_idx in (SELECT board_idx from user_board where user_idx in (SELECT user_idx FROM user WHERE user_bmi BETWEEN ? and ? and user_gender = ? and user_height between ? and ?))';
     let checkBoardResult=await db.queryParam_Arr(checkBoardQuery, [temp, weather,bmi_range_min, bmi_range_max,gender, height-2, height+2]);
     console.log(checkBoardResult);
     let checkstyleQuery='SELECT * FROM board_style WHERE board_idx = ? and style_idx =(select style_idx from style where style_type= ?)';

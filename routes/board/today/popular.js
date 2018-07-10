@@ -97,6 +97,7 @@ router.get('/', async function(req, res){
             board_data = {
                 user_img : user_img, 
                 user_id : getTodayBoardRes[0].writer_id,
+                board_idx : getTodayBoardRes[0].board_idx,
                 board_img : getTodayBoardRes[0].board_img,
                 board_desc : getTodayBoardRes[0].board_desc, 
                 like_cnt : getCntLikeRes[0],
