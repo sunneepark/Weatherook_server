@@ -210,7 +210,7 @@ router.get('/:board_idx', async function(req, res){
             board_temp_min : selectOneBoardResult[0].board_temp_min, 
             board_temp_max : selectOneBoardResult[0].board_temp_max,
             board_weather : selectOneBoardResult[0].board_weather,
-            board_date : selectOneBoardResult[0].board_date,
+            board_date : moment(selectOneBoardResult[0].board_date).format('MM-DD'),
             comment_list : comment_arr,
             comment_cnt : checkCommentInBoardRes.length,
             flag : flag
