@@ -27,8 +27,9 @@ router.post('/', async function(req, res){
         
         let user_idx = decoded.user_idx;
         
-        let insertComment = 'INSERT INTO comment (comment_desc) VALUES (?)'; 
-        let insertCommentRes = await db.queryParam_Arr(insertComment, [comment_desc]);
+
+        let insertComment = 'INSERT INTO comment (comment_desc, comment_id) VALUES(?, (SELECT user_id FROM user WHERE user_idx= ?));'; 
+        let insertCommentRes = await db.queryParam_Arr(insertComment, [comment_desc, user_idx]);
         if(!insertCommentRes){
             res.status(500).send({
                 mesasge : "Internal Server Error"
@@ -39,7 +40,7 @@ router.post('/', async function(req, res){
             let insertCommentUser = 'INSERT INTO user_comment (comment_idx, user_idx) VALUES (?, ?)';
             let insertCommentBoard = 'INSERT INTO board_comment (comment_idx, board_idx) VALUES (?, ?)'; 
             let insertCommentUserRes = await db.queryParam_Arr(insertCommentUser, [comment_idx, user_idx]);
-            let insertCommentBoardRes = await db.queryParam_Arr(insertCommentBoard, [comment_idx, board_idx]); 
+            let insertCommentBoardRes = await db.queryParam_Arr(insertCommentBoard, [comment_idx, board_idx, ]); 
             if(!insertCommentUserRes || !insertCommentBoardRes){
                 res.status(500).send({
                     message : "Internal Server Error"
@@ -146,7 +147,7 @@ router.delete('/', async function(req, res){
 
         if(!checkCmtInBoardRes){
             res.status(500).send({
-                mesage : "Internsal Server Error1"
+                mesage : "Internsal Server Error"
             }); 
         }
         else if(checkCmtInBoardRes.length == 0){ //삭제할 코멘트가 게시글에 달려있지 않을때!
@@ -161,7 +162,7 @@ router.delete('/', async function(req, res){
     
             if(!checkUserInCmtRes){
                 res.status(500).send({
-                    message : "Internal Server Error2"
+                    message : "Internal Server Error"
                 }); 
             }
             else if(checkUserInCmtRes.length == 0){
@@ -175,7 +176,7 @@ router.delete('/', async function(req, res){
     
                 if(!delCmtInfoRes){
                     res.status(500).send({
-                        message : "Internal Server Error3"
+                        message : "Internal Server Error"
                     }); 
                 }
                 else {
@@ -186,6 +187,54 @@ router.delete('/', async function(req, res){
             }   
         }
     }
+}); 
+
+router.get('/:board_idx', async function(req, res){
+    let board_idx = req.params.board_idx; 
+
+    if(!board_idx){
+        res.status(400).send({
+            message : "Null Value"
+        }); 
+        return;
+    }
+
+    let comment_arr = []; 
+    //comment를 가져오기 위한 board_comment와 comment 테이블 접근
+    let checkCmtInBoard = 'SELECT * FROM board_comment WHERE board_idx = ?'; 
+    let checkCmtInBoardRes = await db.queryParam_Arr(checkCmtInBoard, [board_idx]); 
+
+    if(!checkCmtInBoardRes){
+        res.status(500).send({
+            message : "Internal Server Error"
+        }); 
+    }
+    else if(checkCmtInBoardRes.length == 0){
+        //댓글이 없음
+        comment_arr = null; 
+    }
+    else {
+        //댓글이 있음
+        let getCommentInfo = 'SELECT * FROM comment c, (SELECT user_img FROM user u, board b WHERE u.user_id = b.writer_id) u WHERE comment_idx = ?'; 
+        let getCommentInfoRes;
+        for (var i=0; i<checkCmtInBoardRes.length; i++){
+            comment_idx = checkCmtInBoardRes[i].comment_idx; 
+            getCommentInfoRes = await db.queryParam_Arr(getCommentInfo, [comment_idx]); 
+            if(!getCommentInfoRes){
+                res.status(500).send({
+                    message : "Internal Server Error"
+                });
+            }
+            else {
+                comment_arr = comment_arr.concat(getCommentInfoRes[0]); 
+            }
+        }
+    }
+
+    res.status(200).send({
+        message : "Successfully get comment list",
+        data : comment_arr
+    });
 })
 
 module.exports = router; 

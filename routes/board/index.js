@@ -7,5 +7,6 @@ router.use('/follow', require('./follow.js'));
 router.use('/like', require('./like.js'));
 router.use('/comment', require('./comment.js'));
 
+router.use('/today', require('./today/index.js')); 
 
 module.exports = router; 

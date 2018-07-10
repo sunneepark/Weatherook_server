@@ -14,7 +14,7 @@ router.post('/',upload.single('board_img'), async function(req, res){
     let board_temp_min=req.body.board_weather_min;
     let board_temp_max=req.body.board_temp_max;
     let board_auth = req.body.board_auth;
-    let style_type = JSON.parse(req.body.board_stylelist);
+    let style_type = req.body.board_stylelist;
     let board_date=req.body.board_date; //글 등록시간
     //let board_hashtag = JSON.parse(req.body.board_hashtag);
     board_img = req.file.location; 
@@ -126,6 +126,9 @@ router.get('/:board_idx', async function(req, res){
     //let hashtag_desc; 
     let comment_idx;
     let comment_arr = []; 
+    let user_id;
+    let user_img;
+    var flag; //댓글이 2개 이상인지 확인하는 flag
     //board_idx 게시글이 존재하는지 확인
     //board_idx 입력 오류 
     if(!board_idx){
@@ -136,13 +139,11 @@ router.get('/:board_idx', async function(req, res){
     else {
         let selectOneBoardQuery = 'SELECT * FROM board WHERE board_idx = ?'; 
         let selectOneBoardResult = await db.queryParam_Arr(selectOneBoardQuery, [board_idx]); 
-    
+
         //user_idx를 가져오기 위한 user_board 테이블에 접근
         let selectWriterOneBoardQuery = 'SELECT * FROM user_board WHERE board_idx = ?'; 
         let selectWriterOneBoardResult = await db.queryParam_Arr(selectWriterOneBoardQuery, [board_idx]);
-
-        
-
+    
         //like_cnt를 가져오기 위한 board_like와 like 테이블 접근
         let selectLikesCnt = 'SELECT count(*) as count FROM board_like WHERE board_idx = ?';
         let selectLikesCntResult = await db.queryParam_Arr(selectLikesCnt, [board_idx]);
@@ -151,62 +152,79 @@ router.get('/:board_idx', async function(req, res){
         let checkCommentInBoard = 'SELECT * FROM board_comment WHERE board_idx = ?'; 
         let checkCommentInBoardRes = await db.queryParam_Arr(checkCommentInBoard, [board_idx]); 
 
-        if(!checkCommentInBoardRes){
+        if(!checkCommentInBoardRes || !selectOneBoardResult || !selectWriterOneBoardResult || !selectLikesCntResult){
             res.status(500).send({
                 message : "Internal Server Error"
             }); 
         }
+        else if(checkCommentInBoardRes.length == 0){
+            //댓글이 없음
+            comment_arr = null; 
+        }
         else {
-            if(checkCommentInBoardRes.length == 0){
-                //댓글이 없음
-                comment_arr = null; 
+            //댓글이 있음
+            let getUserId = 'SELECT * FROM user WHERE user_idx = ?'; 
+            let getUserIdRes = await db.queryParam_Arr(getUserId, [selectWriterOneBoardResult[0].user_idx]);
+            
+            let getUserImg = 'SELECT user_img FROM user WHERE user_id = ?';
+            let getUserImgRes
+            if(!getUserIdRes){
+                res.status(500).send({
+                    message : "Internal Server Error1"
+                });
+                return
+            }
+            user_id = getUserIdRes[0].user_id;
+            user_img = getUserIdRes[0].user_img; 
+            
+            //let getCommentInfo = 'SELECT * FROM comment c, (SELECT user_img FROM user u, board b WHERE u.user_id = b.writer_id) u WHERE comment_idx = ?'; 
+            //let getCommentInfoRes;
+            let getCommentInfo = 'SELECT * FROM comment WHERE comment_idx = ?'; 
+            let getCommentInfoRes;
+            
+            var len_cmt; 
+            if(checkCommentInBoardRes.length > 2){
+                flag = 1; //댓글 수가 2개 이상일 때 flag = 1
+                len_cmt = 2 //board에서 뿌려줄 comment 수는 2개
             }
             else {
-                //댓글이 있음
-                let getCommentInfo = 'SELECT * FROM comment WHERE comment_idx = ?'; 
-                let getCommentInfoRes
-                for (var i=0; i<checkCommentInBoardRes.length; i++){
-                    comment_idx = checkCommentInBoardRes[i].comment_idx; 
-                    getCommentInfoRes = await db.queryParam_Arr(getCommentInfo, [comment_idx]); 
-                    if(!getCommentInfoRes){
-                        res.status(500).send({
-                            mesasge : "Internal Server Error"
-                        }); 
-                    }
-                    else {
-                        comment_arr = comment_arr.concat(getCommentInfoRes); 
-                    }
+                flag = 0; //댓글 수가 2개보다 적을 때는 flag = 0
+                len_cmt = checkCommentInBoardRes.length //board에서 뿌려줄 comment 수는 원래 코멘트 수와 같다. 
+            }
+            
+            for (var i=0; i<len_cmt; i++){
+                comment_idx = checkCommentInBoardRes[i].comment_idx; 
+                getCommentInfoRes = await db.queryParam_Arr(getCommentInfo, [comment_idx]); 
+                if(!getCommentInfoRes){
+                    res.status(500).send({
+                        mesasge : "Internal Server Error2"
+                    }); 
+                }
+                else {
+                    comment_arr = comment_arr.concat(getCommentInfoRes[0]);
                 }
             }
         }
-        console.log("comment_arr : ", comment_arr);
-        
-        //쿼리 에러
-        if(!selectOneBoardResult) {
-            res.status(500).send({
-                message : "Internal Server Error"
-            }); 
+        let data_res = {
+            user_img : user_img,
+            user_id : user_id, 
+            board_img : selectOneBoardResult[0].board_img,
+            board_desc : selectOneBoardResult[0].board_desc, 
+            //hashtag_desc : hashtag_desc, 
+            like_cnt : selectLikesCntResult[0].count, 
+            board_temp_min : selectOneBoardResult[0].board_temp_min, 
+            board_temp_max : selectOneBoardResult[0].board_temp_max,
+            board_weather : selectOneBoardResult[0].board_weather,
+            board_date : selectOneBoardResult[0].board_date,
+            comment_list : comment_arr,
+            comment_cnt : checkCommentInBoardRes.length,
+            flag : flag
         }
-
-        //정상 수행
-        else {
-            selectOneBoardResult[0].board_date
-            let data_res = {
-                user_idx : selectWriterOneBoardResult[0].user_idx, 
-                board_img : selectOneBoardResult[0].board_img,
-                board_desc : selectOneBoardResult[0].board_desc, 
-                //hashtag_desc : hashtag_desc, 
-                like_cnt : selectLikesCntResult[0].count, 
-                board_temp_min : selectOneBoardResult[0].board_temp_min, 
-                board_temp_max : selectOneBoardResult[0].board_temp_max,
-                board_weather : selectOneBoardResult[0].board_weather,
-                comment_info : comment_arr
-            }
-            res.status(201).send({
-                message : "Successfully get One board", 
-                data : data_res
-            }); 
-        }
+        res.status(201).send({
+            message : "Successfully get One board", 
+            data : data_res
+        }); 
+    
     }
 });
 

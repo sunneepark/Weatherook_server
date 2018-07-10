@@ -70,12 +70,11 @@ var update_weather= async function(Data, save){ //data가 새로 들어온, save
         }
     }
 }
-var cronJob_am= cron.job("*/1 * * * *", async function(){ //3시간마다 비교
+var cronJob_am= cron.job("* */3 * * *", async function(){ //3시간마다 비교
 
     let checkBoardQuery = 'SELECT date FROM weather WHERE date_type=2'; 
     let checkBoardResult = await db.queryParam_None(checkBoardQuery);
     
-    console.log("오늘 날짜는?"+checkBoardResult[0].date);
     var today=moment().format('YYYY-MM-DD');
     var tomorrow;
     var insert_flag=0;
@@ -86,7 +85,7 @@ var cronJob_am= cron.job("*/1 * * * *", async function(){ //3시간마다 비교
 
         let checkQuery1 = 'UPDATE weather SET date_type=date_type-1'; 
         let checkResult1 = await db.queryParam_None(checkQuery1);
-        console.log("updat completed!");
+        console.log("update completed!");
         if(!checkResult || !checkResult1) console.log("query error today");
 
         tomorrow=moment(today).add(1,'days').format('YYYY-MM-DD');
