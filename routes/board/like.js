@@ -31,13 +31,11 @@ router.post('/', async function(req, res){
             }); 
             return; 
         }
-        console.log(checkDupLikeInBoardRes)
 
         let checkDupLike = 'SELECT * FROM weatherook.like WHERE like_idx = ?'
         for (var i=0; i<checkDupLikeInBoardRes.length; i++){
             let checkDupLikeRes = await db.queryParam_Arr(checkDupLike, checkDupLikeInBoardRes[i].like_idx)
             
-            console.log(checkDupLikeRes)
 
             if(!checkDupLikeRes){
                 res.status(500).send({

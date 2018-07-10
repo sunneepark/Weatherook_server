@@ -157,12 +157,7 @@ router.get('/:board_idx', async function(req, res){
                 message : "Internal Server Error"
             }); 
         }
-        else if(checkCommentInBoardRes.length == 0){
-            //댓글이 없음
-            comment_arr = null; 
-        }
         else {
-            //댓글이 있음
             let getUserId = 'SELECT * FROM user WHERE user_idx = ?'; 
             let getUserIdRes = await db.queryParam_Arr(getUserId, [selectWriterOneBoardResult[0].user_idx]);
             
@@ -172,7 +167,7 @@ router.get('/:board_idx', async function(req, res){
                 res.status(500).send({
                     message : "Internal Server Error1"
                 });
-                return
+                return;
             }
             user_id = getUserIdRes[0].user_id;
             user_img = getUserIdRes[0].user_img; 
