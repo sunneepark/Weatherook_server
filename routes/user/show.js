@@ -26,7 +26,7 @@ router.get('/', async function(req, res){
         let showBoardNum = 'SELECT COUNT(board_idx) AS board_num FROM user_board WHERE user_idx=?';
         let showBoardNumResult = await db.queryParam_Arr(showBoardNum, [user_idx]);
         //팔로워 수
-        let showFollowerNum = 'SELECT COUNT(user_idx) AS follwer FROM follow WHERE follower_idx=?';
+        let showFollowerNum = 'SELECT COUNT(user_idx) AS follower FROM follow WHERE follower_idx=?';
         let showFollowerNumResult = await db.queryParam_Arr(showFollowerNum, [user_idx]);
         //팔로잉 수
         let showFolloingNum = 'SELECT COUNT(follower_idx) AS following FROM follow WHERE user_idx=?';
