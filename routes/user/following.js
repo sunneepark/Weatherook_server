@@ -50,11 +50,11 @@ router.put('/', async function (req, res) {
         let find_id = req.body.find_id;
 
         let showFollowingingID = 'SELECT user_id, user_img, user_desc FROM user JOIN follow ON user.user_idx = follow.follower_idx WHERE follow.user_idx = ?';
-        let showFollowingingIDResult = await db.queryParam_Arr(showFollowingingID, [user_idx]);
+        let showFollowingIDResult = await db.queryParam_Arr(showFollowingingID, [user_idx]);
 
-        for(var i=0; i<showFollowingingIDResult.length; i++){
-            if(showFollowingingIDResult[i].user_id == find_id){
-                if(!showFollowingingIDResult){
+        for(var i=0; i<showFollowingIDResult.length; i++){
+            if(showFollowingIDResult[i].user_id == find_id){
+                if(!showFollowingIDResult){
                     res.status(500).send({
                         message : "Internal Server Error"
                     });

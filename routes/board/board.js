@@ -3,6 +3,7 @@ const router = express.Router();
 const db = require('../../module/pool.js'); 
 const upload = require('../../config/multer.js');
 const jwt = require('../../module/jwt.js');
+const moment = require('moment');
 
 //게시글 등록하기
 router.post('/',upload.single('board_img'), async function(req, res){
@@ -10,19 +11,15 @@ router.post('/',upload.single('board_img'), async function(req, res){
     let token = req.headers.token;
     let board_desc = req.body.board_desc;
     
-    //let board_weather=req.body.board_weather;
+    let board_weather=req.body.board_weather;
     let board_temp_min=req.body.board_weather_min;
     let board_temp_max=req.body.board_temp_max;
     let board_auth = req.body.board_auth;
-    let style_type = req.body.board_stylelist;
+    let style_type = JSON.parse(req.body.board_stylelist);
     let board_date=req.body.board_date; //글 등록시간
     //let board_hashtag = JSON.parse(req.body.board_hashtag);
     board_img = req.file.location; 
-
-    
-    //weather= await get.http_gets(x,y);
-    //board_weather=weather[0].wfKor[0];
-    //board_temp=parseInt(weather[0].temp);
+  
 
     // board_img 가 없을 때 
     if(!req.file || !board_desc  || !board_auth || !style_type || !token ){
@@ -111,7 +108,10 @@ router.post('/',upload.single('board_img'), async function(req, res){
                
                 res.status(201).send({
                     message : "Successfully register",
-                    board_idx : board_insert_index
+                    board_img : board_img,
+                    board_idx : board_insert_index,
+                    board_auth : board_auth,
+                    board_stylelist : style_type
                 }); 
             }
             }
@@ -201,6 +201,7 @@ router.get('/:board_idx', async function(req, res){
             }
         }
         let data_res = {
+            board_idx : board_idx,
             user_img : user_img,
             user_id : user_id, 
             board_img : selectOneBoardResult[0].board_img,

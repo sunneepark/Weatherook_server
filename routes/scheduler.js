@@ -15,8 +15,10 @@ var insert_weather=async function(date, Data, loc_type){ //내일 날씨 저장
             var weather_af=await get.weather_get(0,Data[i+5].wfKor[0],0);
             for(var j=1;j<8;j++){
                 temp=parseInt(Data[i+j].temp);
-                if(temp_min > temp) temp_min=temp;
-                if(temp_max < temp) temp_max=temp;
+                if(temp!=0){
+                    if(temp_min > temp) temp_min=temp;
+                    if(temp_max < temp) temp_max=temp;
+                }
             }
 
             let insertQuery = 'INSERT INTO weather (date,temp_min, temp_max, weather_am, weather_af,date_type, loc_type) VALUES (?, ?, ?, ?, ?, ?, ?)'; 
@@ -27,15 +29,11 @@ var insert_weather=async function(date, Data, loc_type){ //내일 날씨 저장
     }
 }
 var update_weather= async function(Data, save){ //data가 새로 들어온, save는 기존 data
-    var time_type;
+
     var date_type;
 
     var temp_min_a;
     var temp_max_a;
-    if(Data[0].hour < 12){ //오전 일때
-        time_type=0;
-    }
-    else time_type=1;
 
     if(Data[0].day ==0 ){ //오늘 일때
         date_type=2;
@@ -47,26 +45,30 @@ var update_weather= async function(Data, save){ //data가 새로 들어온, save
         if(save[j].date_type == date_type){
 
             temp=parseInt(Data[0].temp);
-            if(time_type ==0){
+            if(temp!=0){
                 temp_min_a=save[j].temp_min;
+                temp_max_a=save[j].temp_max;
+                console.log(temp,temp_min_a);
+                console.log(temp,temp_max_a);
                 if(temp_min_a > temp) {
+                    
+                console.log(temp,temp_min_a);
                     temp_min_a=temp;
                     change_flag=1;
                 }
-            }
-            else{
-                temp_max_a=save[j].temp_max;
-                
-                console.log(temp_max_a,temp);
+                 
                 if(temp_max_a < temp) {
+                    
+                console.log(temp,temp_max_a);
                     temp_max_a=temp;
                     change_flag=1;
                 }
+                if(change_flag==1){
+                    checkBoardQuery = 'UPDATE weather SET temp_min= ? , temp_max= ? WHERE idx= ?'; 
+                    checkBoardResult = await db.queryParam_Arr(checkBoardQuery,[temp_min_a,temp_max_a,save[j].idx]);
+                }
             }
-            if(change_flag==1){
-                checkBoardQuery = 'UPDATE weather SET temp_min= ? , temp_max= ? WHERE idx= ?'; 
-                checkBoardResult = await db.queryParam_Arr(checkBoardQuery,[temp_min_a,temp_max_a,save[j].idx]);
-            }                
+                            
         }
     }
 }
