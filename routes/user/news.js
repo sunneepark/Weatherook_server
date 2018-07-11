@@ -49,7 +49,7 @@ router.get('/', async function(req, res, next) {
                             comment_img:commentwriteResult[0].user_img,
                             comment_desc:commentResult[j].comment_desc,
                             comment_id:commentResult[j].comment_id,
-                            date:commentResult[j].comment_date,
+                            date:moment(commentResult[j].comment_date).format('YYYY-MM-DD HH:MM'),
                             date_modify:moment(commentResult[j].comment_date).format('MM-DD HH:MM')
                         } 
                         news_arr.push(comment);

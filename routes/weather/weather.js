@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const get = require('../../module/get.js');
 const db = require('../../module/pool.js');
+const sc=require('../scheduler');
 
 router.post('/', async function(req, res){
     //지역
@@ -19,13 +20,16 @@ router.post('/', async function(req, res){
     let current_temp;
     let current_pop;
     let current_reh; 
-    if(date_type==2){ //현재날씨 일때 날씨, 온도, 강수확률, 습도
-        let weather= await get.http_gets(x,y);
-        console.log(weather[0]);
-        current_weather=weather[0].wfKor[0];
-        current_temp=parseInt(weather[0].temp);
-        current_pop=parseInt(weather[0].pop);
-        current_reh=parseInt(weather[0].reh);   
+    if(date_type==2){ //현재날씨 일때 날씨, 온도, 강수확률, 습도 
+        var current;
+        current = await sc.current_weather();
+        console.log(current);
+        //let weather= await get.http_gets(x,y);
+        //console.log(weather[0]);
+        current_weather=current.wfKor[0];
+        current_temp=parseInt(current.temp);
+        current_pop=parseInt(current.pop);
+        current_reh=parseInt(current.reh);   
     }
     let loc_type; 
     await get.type_get(x,y).then(num=>{loc_type=num});//지역 type

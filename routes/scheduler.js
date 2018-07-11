@@ -31,6 +31,7 @@ var insert_weather=async function(date, Data, loc_type){ //내일 날씨 저장
     }
 }
 var update_weather= async function(Data, save){ //data가 새로 들어온, save는 기존 data
+    current=Data[0];
     var date_type;
 
     var temp_min_a;
@@ -40,28 +41,24 @@ var update_weather= async function(Data, save){ //data가 새로 들어온, save
         date_type=2;
     }
     else date_type=3;
-
+    
     for(var j=0;j<save.length;j++){
         var change_flag=0;
         if(save[j].date_type == date_type){
 
             temp=parseInt(Data[0].temp);
-            current
+            current=Data[0];
             if(temp!=0){
                 temp_min_a=save[j].temp_min;
                 temp_max_a=save[j].temp_max;
                 console.log(temp,temp_min_a);
                 console.log(temp,temp_max_a);
                 if(temp_min_a > temp) {
-                    
-                console.log(temp,temp_min_a);
                     temp_min_a=temp;
                     change_flag=1;
                 }
                  
                 if(temp_max_a < temp) {
-                    
-                console.log(temp,temp_max_a);
                     temp_max_a=temp;
                     change_flag=1;
                 }
@@ -75,7 +72,7 @@ var update_weather= async function(Data, save){ //data가 새로 들어온, save
     }
     return temp;
 }
-var cronJob_am= cron.job("* */3 * * * *", async function(){ //3시간마다 비교
+var cronJob_am= cron.job("*/1 * * * *", async function(){ //3시간마다 비교
 
     let checkBoardQuery = 'SELECT date FROM weather WHERE date_type=2'; 
     let checkBoardResult = await db.queryParam_None(checkBoardQuery);
@@ -127,6 +124,11 @@ var cronJob_am= cron.job("* */3 * * * *", async function(){ //3시간마다 비�
 });
 cronJob_am.start();
 
-
-
 module.exports = router;
+
+module.exports={
+    current_weather : async function(){
+        console.log(current);
+        return current;
+    }
+}

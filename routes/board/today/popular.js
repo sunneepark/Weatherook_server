@@ -6,7 +6,7 @@ const moment = require('moment');
 router.get('/', async function(req, res){
     
     let board_date = moment().format('YYYY-MM-DD HH:mm:ss');
-    let board_day = moment().format('yyyy-mm-dd');
+    let board_day = moment().format('2018-07-01');
 
     let start_day = board_day.concat(' 00:00:00'); 
     let end_day = board_day.concat(' 23:59:59');
@@ -32,10 +32,10 @@ router.get('/', async function(req, res){
     //let getTodayBoard = 'SELECT * FROM (SELECT * FROM board WHERE board_date BETWEEN ? AND ? AND board_auth = "PUBLIC") today_board, weatherook.like, board_like WHERE board_like.board_idx = today_boar.board_idx GROUP BY today_board.board_idx ORDER BY COUNT(board_like.like_idx) ASC ';
     //board_idx, board_img, board_desc, board_date, board_weather, board_temp_min, board_temp_max, board_auth, writer_id, like_idx, like_date, user_idx, board_idx, like_idx(idx별 cnt)
     //오늘 게시글 조회
-    let getTodayBoard = 'SELECT board_idx FROM board WHERE board_date BETWEEN ? AND ? AND board_auth = "PUBLIC"';
+    let getTodayBoard = 'SELECT board_idx FROM board WHERE board_date BETWEEN ? AND ? AND board_auth = "PUBLIC" order by rand() limit 6';
     let getTodayBoardRes = await db.queryParam_Arr(getTodayBoard, [start_day, end_day]); 
 
-    let PopularBoard = 'select board_idx, count(like_idx) as count from board_like group by board_idx order by rand()';
+    let PopularBoard = 'select board_idx, count(like_idx) as count from board_like group by board_idx order by count desc';
     let PopularResult = await db.queryParam_None(PopularBoard);
     
     if(!getTodayBoardRes || !PopularResult)
