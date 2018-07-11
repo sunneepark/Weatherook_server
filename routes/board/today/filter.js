@@ -150,7 +150,8 @@ router.post('/', async function(req, res){
             }
             data_res = {
                 user_img : user_img,
-                user_id : user_id, 
+                user_id : user_id,
+                board_idx : getBoardInFilterRes[0].board_idx,
                 board_img : getBoardInFilterRes[0].board_img,
                 board_desc : getBoardInFilterRes[0].board_desc, 
                 //hashtag_desc : hashtag_desc, 

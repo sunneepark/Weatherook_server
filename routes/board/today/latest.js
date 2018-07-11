@@ -103,6 +103,7 @@ router.get('/', async function(res, res){
                 data_res = {
                     user_img : user_img,
                     user_id : user_id, 
+                    board_idx : selectOneBoardResult[0].board_idx,
                     board_img : selectOneBoardResult[0].board_img,
                     board_desc : selectOneBoardResult[0].board_desc, 
                     //hashtag_desc : hashtag_desc, 

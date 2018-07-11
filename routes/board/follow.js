@@ -22,6 +22,7 @@ router.post('/', async function(req, res){
             res.status(201).send({
                 message : "user have not followers"
             }); 
+            return;
         }
         let checkfollowQuery='select board_idx from board where board_auth="PUBLIC" and board_idx in(select board_idx from user_board where user_idx in (SELECT follower_idx FROM follow where user_idx= ? )) order by board_date desc';
         let checkfollowResult = await db.queryParam_Arr(checkfollowQuery, [user_idx]);
@@ -29,6 +30,13 @@ router.post('/', async function(req, res){
             res.status(500).send({
                 message : "Internal Server Error"
             }); 
+            return;
+        }
+        else if(checkfollowResult.length==0){
+            res.status(201).send({
+                message : "followers don't have board"
+            }); 
+            return;
         }
         else{
             for(var k=0;k<checkfollowResult.length;k++){
