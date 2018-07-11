@@ -16,7 +16,7 @@ router.get('/', async function(req, res){
         connection.release();
     }
     else{ 
-        let comment_arr = [3];
+        let comment_arr = [];
         let user_idx = decoded.user_idx;
 
         //사용자 사진, 아이디, 소개 보여주기
@@ -35,6 +35,13 @@ router.get('/', async function(req, res){
         let showBoardAll = 'SELECT board_img, board_desc, board_date, board_weather, board_temp_min, board_temp_max FROM board JOIN user_board  USING (board_idx) WHERE user_board.user_idx =?';
         let showBoardAllResult = await db.queryParam_Arr(showBoardAll, [user_idx]);
 
+
+        let selectLikesCnt = 'SELECT count(*) as count FROM board_like WHERE board_idx = ?';
+        let selectLikesCntResult = await db.queryParam_Arr(selectLikesCnt, [board_idx]);
+
+        for(var i= 0; i<selectLikesCntResult.length; i++){
+            
+        }
 
 
        // let selectLikesCnt = 'SELECT count(*) as count FROM board_like WHERE board_idx =?';

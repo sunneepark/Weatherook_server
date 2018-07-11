@@ -22,10 +22,13 @@ router.get('/', async function(req, res){
         let user_idx = decoded.user_idx;
 
         //개인 정보 보여주기
-        let showUserQuery = 'SELECT user_img, user_desc, user_age, user_height, user_weight FROM user WHERE user_idx = ?';
+        let showUserQuery = 'SELECT user_img, user_id, user_desc, user_age, user_height, user_weight FROM user WHERE user_idx = ?';
         let showUserResult = await db.queryParam_Arr(showUserQuery, [user_idx]);
 
-        if(!showUserResult){
+        let showUserStyle = 'SELECT style_type FROM style JOIN user_style USING(style_idx) WHERE user_idx = ?';
+        let showUserstyleResult = await db.queryParam_Arr(showUserStyle, [user_idx]);
+
+        if(!showUserResult || !showUserstyleResult){
             res.status(500).send({
                 message : "Internal Server Error"
             });
@@ -34,7 +37,8 @@ router.get('/', async function(req, res){
             res.status(201).send({
                 message : "user show success",
                 data : {
-                    showUserResult
+                    showUserResult,
+                    showUserstyleResult
                 }
             });
         }
