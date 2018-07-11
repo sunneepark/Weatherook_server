@@ -6,11 +6,20 @@ const moment = require('moment');
 
 
 //유저 개인 페이지 보여주기
-router.get('/', async function(req, res){
+router.post('/', async function(req, res){
+    let user_idx;
+    let other_id=req.body.other_id;
     let token = req.headers.token; 
     let decoded = jwt.verify(token);
+    if(other_id){
+        let select = 'SELECT user_idx FROM user WHERE user_id = ?';
+        let selectRes = await db.queryParam_Arr(select, [other_id]);
+        user_idx = selectRes[0].user_idx;
+    }else{
+        user_idx = decoded.user_idx;
+    }
+
     let data_result=[];
-    let user_idx = decoded.user_idx;
     if (decoded == -1){
         res.status(400).send({
             message : "Token error"
@@ -64,7 +73,7 @@ router.get('/', async function(req, res){
                 //user_idx를 가져오기 위한 user_board 테이블에 접근
                 let selectWriterOneBoardQuery = 'SELECT * FROM user_board WHERE board_idx = ?'; 
                 let selectWriterOneBoardResult = await db.queryParam_Arr(selectWriterOneBoardQuery, [board_idx]);
-                console.log(selectWriterOneBoardResult);
+
                 
                 //like_cnt를 가져오기 위한 board_like와 like 테이블 접근
                 let selectLikesCnt = 'SELECT count(*) as count FROM board_like WHERE board_idx = ?';
@@ -148,7 +157,8 @@ router.get('/', async function(req, res){
             data : data_result
         }); 
     }
-    }
+    
+}
 });
 
 
