@@ -219,7 +219,7 @@ router.get('/:board_idx', async function(req, res){
     }
     else {
         //댓글이 있음
-        let getCommentInfo = 'SELECT * FROM comment c, (SELECT user_img FROM user u, board b WHERE u.user_id = b.writer_id) u WHERE comment_idx = ?'; 
+        let getCommentInfo = 'SELECT * FROM comment c, (SELECT user_img FROM user u, comment c WHERE u.user_id = c.comment_id) u WHERE comment_idx = ?'; 
         let getCommentInfoRes;
         for (var i=0; i<checkCmtInBoardRes.length; i++){
             comment_idx = checkCmtInBoardRes[i].comment_idx; 
