@@ -31,9 +31,10 @@ router.get('/', async function(req, res){
    //today_board.board_idx, today_board.board_img, today_board.board_desc, today_board.board_date, today_board.board_weather, today_board.board_temp_min, today_board.board_temp_max, today_board.board_auth, today_board.writer_id, like.like_idx, like.like_date, like.user_idx, count(board_like.like_idx) FROM (SELECT * FROM board WHERE board_auth = "PUBLIC") today_board, weatherook.like, board_like WHERE board_like.board_idx = today_board.board_idx GROUP BY today_board.board_idx ORDER BY board_like.like_idx ASC;
     //let getTodayBoard = 'SELECT * FROM (SELECT * FROM board WHERE board_date BETWEEN ? AND ? AND board_auth = "PUBLIC") today_board, weatherook.like, board_like WHERE board_like.board_idx = today_boar.board_idx GROUP BY today_board.board_idx ORDER BY COUNT(board_like.like_idx) ASC ';
     //board_idx, board_img, board_desc, board_date, board_weather, board_temp_min, board_temp_max, board_auth, writer_id, like_idx, like_date, user_idx, board_idx, like_idx(idx별 cnt)
+    //오늘 게시글 조회
     let getTodayBoard = 'SELECT board_idx FROM board WHERE board_date BETWEEN ? AND ? AND board_auth = "PUBLIC"';
     let getTodayBoardRes = await db.queryParam_Arr(getTodayBoard, [start_day, end_day]); 
-    console.log(getTodayBoardRes);
+
     let PopularBoard = 'select board_idx, count(like_idx) as count from board_like group by board_idx order by rand()';
     let PopularResult = await db.queryParam_None(PopularBoard);
     
@@ -57,11 +58,16 @@ router.get('/', async function(req, res){
             for(j=0;j<getTodayBoardRes.length;j++){
                 if(getTodayBoardRes[j].board_idx == PopularResult[l].board_idx)
                     real_board_idx.push(getTodayBoardRes[j].board_idx);
-            
+            }
         }
-        while(j<getTodayBoardRes.length){
-            real_board_idx.push(getTodayBoardRes[j].board_idx);
-            j++;
+        for(l=0;l<getTodayBoardRes.length;l++){
+            var flag=0;
+            for(j=0;j<real_board_idx.length;j++){
+                if(real_board_idx[j] == getTodayBoardRes[l].board_idx)
+                    break;
+            }
+            if(j==real_board_idx.length)
+                real_board_idx.push(getTodayBoardRes[l].board_idx);
         }
         console.log(real_board_idx,getTodayBoardRes.board_idx);
 
@@ -101,6 +107,7 @@ router.get('/', async function(req, res){
                     res.status(500).send({
                         message : "Internal Server Error"
                     }); 
+                    return;
                 }
                 else {
                     let getUserId = 'SELECT * FROM user WHERE user_idx = ?'; 
@@ -110,7 +117,7 @@ router.get('/', async function(req, res){
                         res.status(500).send({
                             message : "Internal Server Error1"
                         });
-                        return
+                        return;
                     }
                     user_id = getUserIdRes[0].user_id;
                     user_img = getUserIdRes[0].user_img; 
@@ -167,7 +174,6 @@ router.get('/', async function(req, res){
                 data : data_result
             }); 
         }  
-    }
 }); 
 
 module.exports = router; 
