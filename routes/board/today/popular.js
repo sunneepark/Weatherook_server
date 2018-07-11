@@ -32,13 +32,20 @@ router.get('/', async function(req, res){
     //let getTodayBoard = 'SELECT * FROM (SELECT * FROM board WHERE board_date BETWEEN ? AND ? AND board_auth = "PUBLIC") today_board, weatherook.like, board_like WHERE board_like.board_idx = today_boar.board_idx GROUP BY today_board.board_idx ORDER BY COUNT(board_like.like_idx) ASC ';
     //board_idx, board_img, board_desc, board_date, board_weather, board_temp_min, board_temp_max, board_auth, writer_id, like_idx, like_date, user_idx, board_idx, like_idx(idx별 cnt)
     //오늘 게시글 조회
-    let getTodayBoard = 'SELECT board_idx FROM board WHERE board_date BETWEEN ? AND ? AND board_auth = "PUBLIC"';
+    /*let getTodayBoard = 'SELECT board_idx FROM board WHERE board_date BETWEEN ? AND ? AND board_auth = "PUBLIC" order by rand() limit 6';
     let getTodayBoardRes = await db.queryParam_Arr(getTodayBoard, [start_day, end_day]); 
 
-    let PopularBoard = 'select board_idx, count(like_idx) as count from board_like group by board_idx order by rand()';
-    let PopularResult = await db.queryParam_None(PopularBoard);
+    let PopularBoard = 'select board_idx, count(like_idx) as count from board_like group by board_idx order by count desc';
+    let PopularResult = await db.queryParam_None(PopularBoard);*/
+    let Query='create view student as select board_idx from board WHERE board_date BETWEEN ? AND ? AND board_auth = "PUBLIC" order by rand() limit 6';
+    let Result=await db.queryParam_Arr(Query,[start_day, end_day]);
+
+    let PopularQuery='select s.board_idx , count(like_idx) as count from board_like as b right join student as s on b.board_idx =s.board_idx group by s.board_idx order by count desc';
+    let getTodayBoardRes=await db.queryParam_None(PopularQuery);
+    Query='drop view student';
+    Result=await db.queryParam_None(Query);
     
-    if(!getTodayBoardRes || !PopularResult)
+    if(!getTodayBoardRes)
     {
         res.status(500).send({
             message : "Internal Server Error1"
@@ -50,10 +57,10 @@ router.get('/', async function(req, res){
         }); 
     }
     else {//보드 인덱스들 마다 가져오기
-        let real_board_idx=[];
+        /*let real_board_idx=[];
         var l;
         var j;
-        for(l=0;l<PopularResult.length;l++){
+        for(l=0;l<getTodayBoardRes.length;l++){
             var flag=0;
             for(j=0;j<getTodayBoardRes.length;j++){
                 if(getTodayBoardRes[j].board_idx == PopularResult[l].board_idx)
@@ -69,12 +76,12 @@ router.get('/', async function(req, res){
             if(j==real_board_idx.length)
                 real_board_idx.push(getTodayBoardRes[l].board_idx);
         }
-        console.log(real_board_idx,getTodayBoardRes.board_idx);
+        console.log(real_board_idx,getTodayBoardRes.board_idx);*/
 
         let data_res;
         let data_result=[];
-        for(var k=0;k<real_board_idx.length;k++){
-            let board_idx=real_board_idx[k];
+        for(var k=0;k<getTodayBoardRes.length;k++){
+            let board_idx=getTodayBoardRes[k].board_idx;
             let comment_idx;
             let comment_arr = []; 
             let user_id;
@@ -98,7 +105,7 @@ router.get('/', async function(req, res){
                 //like_cnt를 가져오기 위한 board_like와 like 테이블 접근
                 let selectLikesCnt = 'SELECT count(*) as count FROM board_like WHERE board_idx = ?';
                 let selectLikesCntResult = await db.queryParam_Arr(selectLikesCnt, [board_idx]);
-                
+               
                 //comment를 가져오기 위한 board_comment와 comment 테이블 접근
                 let checkCommentInBoard = 'SELECT * FROM board_comment WHERE board_idx = ?'; 
                 let checkCommentInBoardRes = await db.queryParam_Arr(checkCommentInBoard, [board_idx]); 

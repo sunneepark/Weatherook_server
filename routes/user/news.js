@@ -42,13 +42,14 @@ router.get('/', async function(req, res, next) {
                         let commentwriteResult=await db.queryParam_Arr(commentwriteQuery, [commentResult[j].comment_id]);
                         var comment={
                             flag : 0,
+                            comment_str : "님이 댓글을 남겼습니다",
                             board_img:boardResult[0].board_img,
                             board_idx:newsResult[i].board_idx,
                             comment_idx:commentResult[j].comment_idx,
                             comment_img:commentwriteResult[0].user_img,
                             comment_desc:commentResult[j].comment_desc,
                             comment_id:commentResult[j].comment_id,
-                            date:commentResult[j].comment_date,
+                            date:moment(commentResult[j].comment_date).format('YYYY-MM-DD HH:MM'),
                             date_modify:moment(commentResult[j].comment_date).format('MM-DD HH:MM')
                         } 
                         news_arr.push(comment);
@@ -70,6 +71,7 @@ router.get('/', async function(req, res, next) {
                 if(followResult){
                     var follow={
                             flag:1,
+                            follow_str:"님이 회원님을 팔로우 했습니다.",
                             follow:followResult[0].user_id,
                             follow_img : followResult[0].user_img,
                             date:newsResult[i].follow_date,
