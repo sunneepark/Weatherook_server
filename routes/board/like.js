@@ -7,13 +7,14 @@ const jwt = require('../../module/jwt.js');
 router.post('/', async function(req, res){
     let token = req.headers.token;
     let board_idx = req.body.board_idx; 
-    
+    /*
     if (!board_idx){
         res.status(400).send({
             message : "Null Values"
         }); 
         return; 
     }
+    */
 
     let decoded = jwt.verify(token);
     if(decoded == -1){
@@ -69,9 +70,13 @@ router.post('/', async function(req, res){
             }); 
         }
         else {
-            let insertLikeInBoard = 'INSERT INTO board_like (like_idx, board_idx) VALUES (?,?)'; 
-            let insertLikeInBoardRes = await db.queryParam_Arr(insertLikeInBoard, [insertLikeInfoRes.insertId, board_idx]);
+            let find = 'SELECT like_idx FROM weatherook.like ORDER BY like_idx DESC;'
+            let findRes = await db.queryParam_Arr(find);
+            let insertLikeInBoard = 'INSERT INTO board_like (board_idx, like_idx) VALUES (?,?)'; 
+            let insertLikeInBoardRes = await db.queryParam_Arr(insertLikeInBoard, [board_idx, findRes[0].like_idx]);
+            console.log(insertLikeInBoardRes);
             if(!insertLikeInBoardRes){
+                console.log("dddd");
                 res.status(500).send({
                     message : "Internal Server Error"
                 });

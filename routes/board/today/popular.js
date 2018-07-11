@@ -144,6 +144,7 @@ router.get('/', async function(req, res){
                     }
                 }
                 data_res = {
+                    board_idx : board_idx,
                     user_img : user_img,
                     user_id : user_id, 
                     board_img : selectOneBoardResult[0].board_img,
