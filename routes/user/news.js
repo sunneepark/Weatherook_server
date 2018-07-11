@@ -5,7 +5,7 @@ const db = require('../../module/pool.js');
 const jwt = require('../../module/jwt.js');
 const moment = require('moment');
 
-router.post('/', async function(req, res, next) {
+router.get('/', async function(req, res, next) {
     let token = req.headers.token;
     if(!token){
         res.status(400).send({
@@ -30,15 +30,26 @@ router.post('/', async function(req, res, next) {
             for(var i=0;i<newsResult.length;i++){
                 let commentQuery='select * from weatherook.comment where comment_idx in (select comment_idx from board_comment where board_idx =?) order by comment_date desc';
                 let commentResult=await db.queryParam_Arr(commentQuery, [newsResult[i].board_idx]);
-                
+
+                let boardQuery='select board_img from board where board_idx=?';
+                let boardResult = await db.queryParam_Arr(boardQuery, [newsResult[i].board_idx]);
+
                 if(commentResult){
+                
                     for(var j=0;j<commentResult.length;j++){
+                        
+                        let commentwriteQuery ='select user_img from user where user_id = ?';
+                        let commentwriteResult=await db.queryParam_Arr(commentwriteQuery, [commentResult[j].comment_id]);
                         var comment={
+                            flag : 0,
+                            board_img:boardResult[0].board_img,
                             board_idx:newsResult[i].board_idx,
                             comment_idx:commentResult[j].comment_idx,
+                            comment_img:commentwriteResult[0].user_img,
                             comment_desc:commentResult[j].comment_desc,
                             comment_id:commentResult[j].comment_id,
-                            date:commentResult[j].comment_date
+                            date:commentResult[j].comment_date,
+                            date_modify:moment(commentResult[j].comment_date).format('MM-DD HH:MM')
                         } 
                         news_arr.push(comment);
                     }  
@@ -54,12 +65,15 @@ router.post('/', async function(req, res, next) {
             newsResult=await db.queryParam_Arr(newsQuery, [user_idx]);
              
             for(var i=0;i<newsResult.length;i++){
-                let followQuery='select user_id from user where user_idx =?';
+                let followQuery='select * from user where user_idx =?';
                 let followResult=await db.queryParam_Arr(followQuery, [newsResult[i].user_idx]);
                 if(followResult){
                     var follow={
+                            flag:1,
                             follow:followResult[0].user_id,
-                            date:newsResult[i].follow_date
+                            follow_img : followResult[0].user_img,
+                            date:newsResult[i].follow_date,
+                            date_modify:moment(newsResult[i].follow_date).format('MM-DD HH:MM')
                     } 
                     news_arr.push(follow);
                 }
