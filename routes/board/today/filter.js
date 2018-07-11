@@ -51,14 +51,12 @@ router.post('/', async function(req, res){
     let style=JSON.parse(req.body.stylelist);
     let checkBoardQuery = 'SELECT * FROM user_board WHERE board_idx IN (SELECT board_idx FROM board WHERE board_date BETWEEN ? AND ? AND board_auth = "PUBLIC") AND user_idx IN (SELECT user_idx FROM user WHERE user_gender = ? AND user_bmi BETWEEN ? AND ? AND user_height BETWEEN ? AND ?)';
     let checkBoardResult=await db.queryParam_Arr(checkBoardQuery, [start_day, end_day, gender, bmi_range_min, bmi_range_max, height-2, height+2]);
-    console.log(checkBoardResult);
     let checkstyleQuery='SELECT * FROM board_style WHERE board_idx = ? and style_idx =(select style_idx from style where style_type= ?)';
     let checkstyleResult;
     let real_board_idx=[];
 
     //console.log(checkBoardResult);
     //스타일과 보드를 비교함.
-    console.log(checkBoardResult.length, style.length);
     for(var j=0;j<checkBoardResult.length;j++){
         let check=0;
         for(var i=0;i<style.length;i++){
@@ -73,11 +71,12 @@ router.post('/', async function(req, res){
     }
     console.log(real_board_idx);
     //필터링 결과로 게시글 출력
+    let board_list = []; 
     for(var i = 0; i<real_board_idx.length; i++){
         let board_idx = real_board_idx[i]; 
         let comment_idx;
         let comment_arr = [];
-        console.log(i,":",board_idx)
+        
         if(!board_idx){
             res.status(400).send({
                 message : "Null Value"
@@ -106,14 +105,13 @@ router.post('/', async function(req, res){
                 }); 
             }
             else {
-                console.log("getUserImgInFilterRes : ", getUserImgInFilterRes)
-                console.log("getBoardInFilterRes :", getBoardInFilterRes)
+                
                 let getUserId = 'SELECT * FROM user WHERE user_id = ?'; 
                 let getUserIdRes = await db.queryParam_Arr(getUserId, [getBoardInFilterRes[0].writer_id]);
-                console.log("getUserIdRes : ", getUserIdRes)
+                
                 if(!getUserIdRes){
                     res.status(500).send({
-                        message : "Internal Server Error1"
+                        message : "Internal Server Error"
                     });
                     return
                 }
@@ -140,7 +138,7 @@ router.post('/', async function(req, res){
                     getCommentInfoRes = await db.queryParam_Arr(getCommentInfo, [comment_idx]); 
                     if(!getCommentInfoRes){
                         res.status(500).send({
-                            mesasge : "Internal Server Error2"
+                            mesasge : "Internal Server Error"
                         }); 
                     }
                     else {
@@ -148,25 +146,28 @@ router.post('/', async function(req, res){
                     }
                 }
             }
-            
-        }
-        console.log(getBoardInFilterRes[0])
-        data_res = {
-            user_img : user_img,
-            user_id : user_id, 
-            board_img : getBoardInFilterRes[0].board_img,
-            board_desc : getBoardInFilterRes[0].board_desc, 
-            //hashtag_desc : hashtag_desc, 
-            like_cnt : getLikeCntInFilterRes[0].count, 
-            board_temp_min : getBoardInFilterRes[0].board_temp_min, 
-            board_temp_max : getBoardInFilterRes[0].board_temp_max,
-            board_weather : getBoardInFilterRes[0].board_weather,
-            board_date : moment(getBoardInFilterRes[0].board_date).format('MM-DD'),
-            comment_list : comment_arr,
-            comment_cnt : checkCommentInBoardRes.length,
-            flag : flag
+            data_res = {
+                user_img : user_img,
+                user_id : user_id, 
+                board_img : getBoardInFilterRes[0].board_img,
+                board_desc : getBoardInFilterRes[0].board_desc, 
+                //hashtag_desc : hashtag_desc, 
+                like_cnt : getLikeCntInFilterRes[0].count, 
+                board_temp_min : getBoardInFilterRes[0].board_temp_min, 
+                board_temp_max : getBoardInFilterRes[0].board_temp_max,
+                board_weather : getBoardInFilterRes[0].board_weather,
+                board_date : moment(getBoardInFilterRes[0].board_date).format('MM-DD'),
+                comment_list : comment_arr,
+                comment_cnt : checkCommentInBoardRes.length,
+                flag : flag
+            }
+            board_list = board_list.concat(data_res);
         }
     }
+    res.status(200).send({
+        message : "Successfully today board filtering",
+        data : board_list
+    });
 })
 
 module.exports = router;
