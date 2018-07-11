@@ -5,6 +5,8 @@ const moment = require('moment');
 const db = require('../module/pool.js'); 
 const get = require('../module/get.js');
 
+
+var current=0;
 var insert_weather=async function(date, Data, loc_type){ //내일 날씨 저장
     for(var i=0;i<Data.length;i++){
         if(Data[i].day == 1){
@@ -29,7 +31,6 @@ var insert_weather=async function(date, Data, loc_type){ //내일 날씨 저장
     }
 }
 var update_weather= async function(Data, save){ //data가 새로 들어온, save는 기존 data
-
     var date_type;
 
     var temp_min_a;
@@ -45,6 +46,7 @@ var update_weather= async function(Data, save){ //data가 새로 들어온, save
         if(save[j].date_type == date_type){
 
             temp=parseInt(Data[0].temp);
+            current
             if(temp!=0){
                 temp_min_a=save[j].temp_min;
                 temp_max_a=save[j].temp_max;
@@ -71,8 +73,9 @@ var update_weather= async function(Data, save){ //data가 새로 들어온, save
                             
         }
     }
+    return temp;
 }
-var cronJob_am= cron.job("* */3 * * *", async function(){ //3시간마다 비교
+var cronJob_am= cron.job("* */3 * * * *", async function(){ //3시간마다 비교
 
     let checkBoardQuery = 'SELECT date FROM weather WHERE date_type=2'; 
     let checkBoardResult = await db.queryParam_None(checkBoardQuery);
@@ -96,8 +99,8 @@ var cronJob_am= cron.job("* */3 * * *", async function(){ //3시간마다 비교
     
     let checkQuery2 = 'SELECT * FROM weather WHERE loc_type=0 AND (date_type=2 OR date_type=3)'; 
     let checkResult2 = await db.queryParam_None(checkQuery2); 
-    get.getKoreanWeather("서울특별시","강남구","역삼1동",function(error,topObj,midObj,leafObj,weather){  
-        update_weather(weather,checkResult2);
+    get.getKoreanWeather("서울특별시","강남구","역삼1동",async function(error,topObj,midObj,leafObj,weather){  
+        await update_weather(weather,checkResult2).then(num=>{current=num});
         if(insert_flag==1) insert_weather(tomorrow,weather,0);
     });
     
@@ -123,5 +126,7 @@ var cronJob_am= cron.job("* */3 * * *", async function(){ //3시간마다 비교
     });
 });
 cronJob_am.start();
+
+
 
 module.exports = router;
