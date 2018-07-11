@@ -19,11 +19,6 @@ router.post('/',upload.single('board_img'), async function(req, res){
     //let board_hashtag = JSON.parse(req.body.board_hashtag);
     board_img = req.file.location; 
 
-    
-    //weather= await get.http_gets(x,y);
-    //board_weather=weather[0].wfKor[0];
-    //board_temp=parseInt(weather[0].temp);
-
     // board_img 가 없을 때 
     if(!req.file || !board_desc  || !board_auth || !style_type || !token ){
         res.status(400).send({

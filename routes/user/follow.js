@@ -34,9 +34,9 @@ router.post('/', async function(req, res){
         putfollowQuery="SELECT * FROM follow WHERE user_idx = ? and follower_idx =? ";
         putStyleResult=await db.queryParam_Arr(putfollowQuery, [user_index, follower_index]);
         if(putStyleResult.length > 0){ //이미 팔로우 했다면
-            putStyleQuery="DELETE FROM follow where user_idx = ? and follower_idx= ?";
-            putStyleResult=await db.queryParam_Arr(putStyleQuery, [user_index ,follower_index]);
-            if(!putStyleResult){ //쿼리 에러 
+            let deleteQuery="DELETE FROM follow where user_idx = ? and follower_idx= ?";
+            let deleteResult=await db.queryParam_Arr(deleteQuery, [user_index ,follower_index]);
+            if(!deleteResult){ //쿼리 에러 
                 res.status(500).send({
                     message : "Internal Server Error"
                 }); 
@@ -47,7 +47,7 @@ router.post('/', async function(req, res){
                 });
             }
         }
-        else{
+        else{ //팔로우 안했다면 
             let follow_date = moment().format('MM-DD'); 
         
             putfollowQuery="INSERT INTO follow (follow_date, user_idx , follower_idx) VALUES (?, ?, ?)";
