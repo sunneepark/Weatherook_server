@@ -3,6 +3,7 @@ const router = express.Router();
 const db = require('../../module/pool.js'); 
 const upload = require('../../config/multer.js');
 const jwt = require('../../module/jwt.js');
+const moment = require('moment');
 
 router.post('/',upload.single('board_img'), async function(req, res){
     let gender=req.body.gender;
@@ -61,7 +62,6 @@ router.post('/',upload.single('board_img'), async function(req, res){
     let data_result=[];
     for(var k=0;k<real_board_idx.length;k++){
         let board_idx=real_board_idx[k];
-        console.log(board_idx);
         let comment_idx;
         let comment_arr = []; 
         let user_id;
@@ -139,6 +139,7 @@ router.post('/',upload.single('board_img'), async function(req, res){
             data_res = {
                 user_img : user_img,
                 user_id : user_id, 
+                board_idx : selectOneBoardResult[0].board_idx,
                 board_img : selectOneBoardResult[0].board_img,
                 board_desc : selectOneBoardResult[0].board_desc, 
                 //hashtag_desc : hashtag_desc, 
