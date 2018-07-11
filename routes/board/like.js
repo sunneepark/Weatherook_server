@@ -7,13 +7,14 @@ const jwt = require('../../module/jwt.js');
 router.post('/', async function(req, res){
     let token = req.headers.token;
     let board_idx = req.body.board_idx; 
-    
+    /*
     if (!board_idx){
         res.status(400).send({
             message : "Null Values"
         }); 
-        return; 
+        return;     
     }
+    */
 
     let decoded = jwt.verify(token);
     if(decoded == -1){
@@ -41,7 +42,6 @@ router.post('/', async function(req, res){
                 res.status(500).send({
                     message : "Internal Server Error"
                 });
-                return; 
             }
             else if(checkDupLikeRes != []){
                 let checkLikeUser = 'SELECT * FROM weatherook.like WHERE user_idx = ?';
@@ -53,25 +53,38 @@ router.post('/', async function(req, res){
                     }); 
                 }
                 else if(checkLikeUserRes != []){
-                    res.status(400).send({
-                        message : "Already Exist Like"
-                    });
-                    return;
+                    let delLike = 'DELETE FROM weatherook.like WHERE like_idx = ?';
+                    let delLikeRes = await db.queryParam_Arr(delLike, [checkDupLikeRes[i].like_idx]);
+                    if(!delLikeRes){
+                        res.status(500).send({
+                            message : "Internal Server Error"
+                        }); 
+                    }
+                    else {
+                        res.status(200).send({
+                            message : "Succssfully delete like"
+                        }); 
+                    }
                 }
             }
         }
 
         let insertLikeInfo = 'INSERT INTO weatherook.like (user_idx) VALUES (?)';
         let insertLikeInfoRes = await db.queryParam_Arr(insertLikeInfo, [user_idx]);
+
         if(!insertLikeInfoRes){
             res.status(500).send({
                 message : "Internal Server Error"
             }); 
         }
         else {
-            let insertLikeInBoard = 'INSERT INTO board_like (like_idx, board_idx) VALUES (?,?)'; 
-            let insertLikeInBoardRes = await db.queryParam_Arr(insertLikeInBoard, [insertLikeInfoRes.insertId, board_idx]);
+            let find = 'SELECT like_idx FROM weatherook.like ORDER BY like_idx DESC;'
+            let findRes = await db.queryParam_Arr(find);
+            let insertLikeInBoard = 'INSERT INTO board_like (board_idx, like_idx) VALUES (?,?)'; 
+            let insertLikeInBoardRes = await db.queryParam_Arr(insertLikeInBoard, [board_idx, findRes[0].like_idx]);
+            console.log(insertLikeInBoardRes);
             if(!insertLikeInBoardRes){
+                console.log("dddd");
                 res.status(500).send({
                     message : "Internal Server Error"
                 });
@@ -85,64 +98,4 @@ router.post('/', async function(req, res){
     }
 });
 
-router.delete('/', async function(req, res){
-    let token = req.headers.token;
-    let board_idx = req.body.board_idx; 
-    if(!board_idx){
-        res.status(400).send({
-            message : "Null Value"
-        }); 
-        return; 
-    }
-
-    let decoded = jwt.verify(token);
-    if(decoded == -1){
-        res.status(500).send({
-            message : "Token Error"
-        }); 
-    }
-    else {
-        let user_idx = decoded.user_idx; 
-
-        let checkUserLike = 'SELECT * FROM weatherook.like WHERE user_idx = ?';
-        let checkUserLikeRes = await db.queryParam_Arr(checkUserLike, [user_idx]); 
-
-        if(!checkUserLikeRes){
-            res.status(500).send({
-                message : "Internal Server Error"
-            });
-        }
-        else {
-            let checkforDelLikeRes;
-            for(var j = 0; j < checkUserLikeRes.length; j++){
-                let checkforDelLike = 'SELECT * FROM board_like WHERE board_idx = ? AND like_idx = ?'; 
-                checkforDelLikeRes = await db.queryParam_Arr(checkforDelLike, [board_idx, checkUserLikeRes[0].like_idx])
-                if(!checkforDelLikeRes){
-                    res.status(500).send({
-                        message : "Internal Server Error"
-                    });
-                }
-            }
-            if(checkforDelLikeRes.length == 0){
-                res.status(200).send({
-                    message : "No Like Data"
-                });
-            }else{
-                let deleteLike = 'DELETE FROM weatherook.like WHERE like_idx=?';
-                let deleteLikeRes = await db.queryParam_Arr(deleteLike, [checkforDelLikeRes[0].like_idx]);
-                if(!deleteLikeRes){
-                    res.status(500).send({
-                        message : "Internal Server Error"
-                    }); 
-                }
-                else{
-                    res.status(201).send({
-                        message : "Successfully delete like"
-                    });
-                }
-
-            }
-        }
-    }
-})
 module.exports = router; 

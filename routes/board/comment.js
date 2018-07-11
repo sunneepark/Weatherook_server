@@ -50,7 +50,9 @@ router.post('/', async function(req, res){
             else{
                 res.status(201).send({
                     message : "Successfully register comment",
-                    comment_idx : comment_idx
+                    comment_idx : comment_idx,
+                    board_idx : board_idx,
+                    comment_desc : comment_desc
                 });
             }
         }
@@ -117,7 +119,9 @@ router.put('/:board_idx', async function(req, res){
                     else {
                         res.status(201).send({
                             message : "Successfully update comment", 
-                            comment_idx : comment_idx
+                            comment_idx : comment_idx,
+                            comment_desc : comment_desc,
+                            board_idx : board_idx
                         }); 
                     }
                 }
