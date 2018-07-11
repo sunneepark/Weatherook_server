@@ -119,7 +119,7 @@ router.get('/', async function(res, res){
             }
         }
         res.status(201).send({
-            message : "Successfully today popular",
+            message : "Successfully today latest",
             data : board_list
         }); 
     }
