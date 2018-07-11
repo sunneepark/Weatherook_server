@@ -88,7 +88,7 @@ router.post('/', async function(req, res){
             let getBoardInFilterRes = await db.queryParam_Arr(getBoardInFilter, [board_idx]); 
             
             //필터링한 보드의 작성자 이미지 
-            let getUserImgInFilter = 'SELECT user_img FROM user WHERE user_idx IN (SELECT user_idx FROM user_board WHERE board_idx = ?)'; 
+            let getUserImgInFilter = 'SELECT * FROM user WHERE user_idx IN (SELECT user_idx FROM user_board WHERE board_idx = ?)'; 
             let getUserImgInFilterRes = await db.queryParam_Arr(getUserImgInFilter, [board_idx]); 
 
             //필터링한 보드의 좋아요 수
@@ -115,7 +115,9 @@ router.post('/', async function(req, res){
                     });
                     return
                 }
-                user_id = getUserImgInFilterRes[0].writer_id;
+                console.log("getUserImgInFilterRes : ", getUserImgInFilterRes)
+                user_id = getUserImgInFilterRes[0].user_id;
+                console.log("user_id : ", user_id);
                 user_img = getUserImgInFilterRes[0].user_img; 
                 
                 //let getCommentInfo = 'SELECT * FROM comment c, (SELECT user_img FROM user u, board b WHERE u.user_id = b.writer_id) u WHERE comment_idx = ?'; 
