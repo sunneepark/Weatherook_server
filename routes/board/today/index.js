@@ -3,5 +3,6 @@ var router = express.Router();
 
 router.use('/latest', require('./latest.js'));
 router.use('/popular', require('./popular.js')); 
+router.use('/filter', require('./filter.js'));
 
 module.exports = router; 
