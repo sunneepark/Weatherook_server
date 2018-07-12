@@ -1,0 +1,56 @@
+swagger: "2.0"
+info:
+  title: weatherook
+  version: "1.0"
+  description: "project weatherook's server API"
+
+host: localhost:3004
+basePath: /api/v1.0
+schemes:
+  - http
+  - https
+paths:
+    /account/signin/app:
+    post:
+      summary: signin(alex)
+      description: signin
+      consumes:
+        - application/x-www-form-urlencoded
+      tags:
+        - account
+      parameters:
+        - in: body
+          name : data
+          schema:
+            type: object
+            required:
+              - email
+              - password
+            properties:
+              email:
+                type: string
+                example : dla1635@gmail.com
+              password:
+                type: string
+                example : "1234"
+      responses:
+        200:
+          description: status code 200
+          schema:
+            $ref: "#/definitions/200_account_signin_app"
+
+            
+definitions:
+  
+    200_account_signin_app:
+        type: object
+        properties:
+          message:
+            type: string
+            example: "Sucessfully signin!!" 
+          data:
+            type: object
+            properties:
+              token:
+                type: string
+                example : "asdsd@#as.d@#$kfoke;w/.!@#asd#"
