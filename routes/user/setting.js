@@ -193,6 +193,7 @@ router.put('/',upload.single('user_img'), async function(req, res){
             let deleteUserStyleResult = await db.queryParam_Arr(deleteUserStyle, [user_idx]);
 
             for(var i=0;i<user_stylelist.length;i++){ //유저와 스타일 등록
+                console.log(user_stylelist[i]);
                 let settingStyleQuery= "SELECT style_idx FROM style WHERE style_type= ?";
                 let settingStyleResult = await db.queryParam_Arr(settingStyleQuery,user_stylelist[i]);
                 let styleindex=parseInt(settingStyleResult[0].style_idx,10);
