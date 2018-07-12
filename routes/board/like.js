@@ -23,78 +23,61 @@ router.post('/', async function(req, res){
         }); 
     }
     else {
+        let like_flag=0;
         let user_idx = decoded.user_idx; 
-        let checkDupLikeInBoard = 'SELECT * FROM board_like WHERE board_idx =?'
-        let checkDupLikeInBoardRes = await db.queryParam_Arr(checkDupLikeInBoard, [board_idx]);
-        if (!checkDupLikeInBoardRes){
+        
+        let checkDupLike = 'select * from weatherook.like where like_idx in (select like_idx from board_like where board_idx =?)'
+        let checkDupLikeRes = await db.queryParam_Arr(checkDupLike, board_idx);
+        console.log(checkDupLikeRes);
+        if(!checkDupLikeRes){
             res.status(500).send({
                 message : "Internal Server Error"
-            }); 
-            return; 
+            });
+            return;
         }
+        else{
+            for (var i=0; i<checkDupLikeRes.length; i++){
+                if(checkDupLikeRes[i].user_idx == user_idx){ //좋아요가 눌러졌을 때
+                    like_flag=1;
+                    let deletelike='DELETE from weatherook.like where like_idx=?';
+                    let deletequery=await db.queryParam_Arr(deletelike, [checkDupLikeRes[i].like_idx]);
 
-        let checkDupLike = 'SELECT * FROM weatherook.like WHERE like_idx = ?'
-        for (var i=0; i<checkDupLikeInBoardRes.length; i++){
-            let checkDupLikeRes = await db.queryParam_Arr(checkDupLike, checkDupLikeInBoardRes[i].like_idx)
-            
-
-            if(!checkDupLikeRes){
-                res.status(500).send({
-                    message : "Internal Server Error"
-                });
-            }
-            else if(checkDupLikeRes != []){
-                let checkLikeUser = 'SELECT * FROM weatherook.like WHERE user_idx = ?';
-                let checkLikeUserRes = await db.queryParam_Arr(checkLikeUser, [checkDupLikeRes[i].user_idx]);
-
-                if(!checkLikeUserRes){
-                    res.status(500).send({
-                        message : "Internal Server Error"
-                    }); 
-                }
-                else if(checkLikeUserRes != []){
-                    let delLike = 'DELETE FROM weatherook.like WHERE like_idx = ?';
-                    let delLikeRes = await db.queryParam_Arr(delLike, [checkDupLikeRes[i].like_idx]);
-                    if(!delLikeRes){
+                    if(!deletequery){
                         res.status(500).send({
                             message : "Internal Server Error"
                         }); 
                     }
-                    else {
-                        res.status(200).send({
-                            message : "Succssfully delete like"
-                        }); 
-                    }
+                    break;
+                } 
+            }
+        }
+        if(like_flag==0){
+
+            let insertLikeInfo = 'INSERT INTO weatherook.like (user_idx) VALUES (?)';
+            let insertLikeInfoRes = await db.queryParam_Arr(insertLikeInfo, [user_idx]);
+            let like__idx=insertLikeInfoRes.insertId;
+            let insertLikeInBoard = 'INSERT INTO board_like (board_idx, like_idx) VALUES (?,?)'; 
+            let insertLikeInBoardRes = await db.queryParam_Arr(insertLikeInBoard, [board_idx, like__idx]);
+    
+            if(!insertLikeInfoRes || !insertLikeInBoardRes){
+                res.status(500).send({
+                    message : "Internal Server Error"
+                }); 
+            }
+            else{
+                if(like_flag==0){
+                    res.status(201).send({
+                        message : "Successfully update like"
+                    });
                 }
             }
         }
-
-        let insertLikeInfo = 'INSERT INTO weatherook.like (user_idx) VALUES (?)';
-        let insertLikeInfoRes = await db.queryParam_Arr(insertLikeInfo, [user_idx]);
-
-        if(!insertLikeInfoRes){
-            res.status(500).send({
-                message : "Internal Server Error"
-            }); 
+        if(like_flag==1){
+            res.status(201).send({
+                message : "Successfully delete like"
+            });
         }
-        else {
-            let find = 'SELECT like_idx FROM weatherook.like ORDER BY like_idx DESC;'
-            let findRes = await db.queryParam_Arr(find);
-            let insertLikeInBoard = 'INSERT INTO board_like (board_idx, like_idx) VALUES (?,?)'; 
-            let insertLikeInBoardRes = await db.queryParam_Arr(insertLikeInBoard, [board_idx, findRes[0].like_idx]);
-            console.log(insertLikeInBoardRes);
-            if(!insertLikeInBoardRes){
-                console.log("dddd");
-                res.status(500).send({
-                    message : "Internal Server Error"
-                });
-            }
-            else{
-                res.status(201).send({
-                    message : "Successfully update like"
-                }); 
-            }
-        }
+    
     }
 });
 
