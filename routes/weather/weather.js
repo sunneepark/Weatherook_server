@@ -47,8 +47,8 @@ router.post('/', async function(req, res){
             current_temp:current_temp,
             current_pop:current_pop,
             current_reh:current_reh,
-            temp_af:checkweatherResult[0].temp_min,
-            temp_am:checkweatherResult[0].temp_max,
+            temp_am:checkweatherResult[0].temp_min,
+            temp_af:checkweatherResult[0].temp_max,
             weather_af:checkweatherResult[0].weather_af,
             weather_am:checkweatherResult[0].weather_am
         }
