@@ -187,7 +187,7 @@ router.put('/',upload.single('user_img'), async function(req, res){
                 }
             });*/
         }
-    
+        console.log(user_stylelist);
         if(user_stylelist){
             let deleteUserStyle = 'DELETE FROM user_style WHERE user_idx = ?'
             let deleteUserStyleResult = await db.queryParam_Arr(deleteUserStyle, [user_idx]);
