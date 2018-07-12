@@ -4,7 +4,7 @@ const db = require('../../module/pool.js');
 const jwt = require('../../module/jwt.js');
 const moment = require('moment');
 
-router.post('/', async function(req, res){
+router.get('/', async function(req, res){
     let token = req.headers.token;
     let decoded = jwt.verify(token);
     if (decoded == -1){
