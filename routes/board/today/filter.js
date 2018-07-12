@@ -61,7 +61,7 @@ router.post('/', async function(req, res){
     //let checkUserQuery = 'SELECT * from user_board where user_idx in (SELECT user_idx FROM user WHERE user_bmi BETWEEN ? and ? and user_gender = ? and user_height between ? and ?)';
     //let checkUserResult = await db.queryParam_Arr(checkUserQuery, [bmi_range_min, bmi_range_max,height-2, height+2]); 
     
-    let style=JSON.parse(req.body.stylelist);
+    let style=req.body.stylelist;
     let checkBoardQuery = 'SELECT * FROM user_board WHERE board_idx IN (SELECT board_idx FROM board WHERE board_date BETWEEN ? AND ? AND board_auth = "PUBLIC") AND user_idx IN (SELECT user_idx FROM user WHERE user_gender = ? AND user_bmi BETWEEN ? AND ? AND user_height BETWEEN ? AND ?)';
     let checkBoardResult=await db.queryParam_Arr(checkBoardQuery, [start_day, end_day, gender, bmi_range_min, bmi_range_max, height-2, height+2]);
     let checkstyleQuery='SELECT * FROM board_style WHERE board_idx = ? and style_idx =(select style_idx from style where style_type= ?)';

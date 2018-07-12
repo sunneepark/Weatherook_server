@@ -16,7 +16,7 @@ router.post('/', async function(req, res){
     
     let user_bmi=user_weight/(user_height/100*user_height/100);
     let user_stylelist=req.body.user_stylelist;
-
+    console.log(user_stylelist);
     //id 또는 pw 입력 오류 시
     if(!user_id || !user_pw){
         res.status(400).send({
@@ -54,6 +54,7 @@ router.post('/', async function(req, res){
                 checkUserResult = await db.queryParam_Arr(checkUserQuery, user_id);
                 let userindex=parseInt(checkUserResult[0].user_idx,10);
                     for(var i=0;i<user_stylelist.length;i++){ //유저와 스타일 등록
+                        console.log(user_stylelist[i]);
                         let signupStyleQuery="SELECT style_idx FROM style WHERE style_type= ?";
                         let signupStyleResult = await db.queryParam_Arr(signupStyleQuery,user_stylelist[i]);
                         let styleindex=parseInt(signupStyleResult[0].style_idx,10);

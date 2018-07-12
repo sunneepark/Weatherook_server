@@ -58,7 +58,7 @@ router.get('/', async function(req, res){
     console.log(loc_type);
     let checkweatherQuery = "SELECT * FROM weather WHERE date_type= ? and loc_type= ?"; 
     let checkweatherResult = await db.queryParam_Arr(checkweatherQuery, [date_type, loc_type]);
-    console.log(checkweatherResult);
+    
     if(!checkweatherResult){ //쿼리 오류
         res.status(500).send({
             message : "Internal Server Error"

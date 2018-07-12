@@ -23,8 +23,6 @@ router.post('/', async function(req, res){
     if(date_type==2){ //현재날씨 일때 날씨, 온도, 강수확률, 습도 
         var current;
         current = await sc.current_weather();
-        //let weather= await get.http_gets(x,y);
-        //console.log(weather[0]);
         current_weather=await get.weather_get(0,current.wfKor[0],0);
         
         current_temp=parseInt(current.temp);
@@ -36,7 +34,7 @@ router.post('/', async function(req, res){
     console.log(loc_type);
     let checkweatherQuery = "SELECT * FROM weather WHERE date_type= ? and loc_type= ?"; 
     let checkweatherResult = await db.queryParam_Arr(checkweatherQuery, [date_type, loc_type]);
-    console.log(checkweatherResult);
+    
     if(!checkweatherResult){ //쿼리 오류
         res.status(500).send({
             message : "Internal Server Error"
@@ -49,8 +47,8 @@ router.post('/', async function(req, res){
             current_temp:current_temp,
             current_pop:current_pop,
             current_reh:current_reh,
-            temp_af:checkweatherResult[0].temp_min,
-            temp_am:checkweatherResult[0].temp_max,
+            temp_am:checkweatherResult[0].temp_min,
+            temp_af:checkweatherResult[0].temp_max,
             weather_af:checkweatherResult[0].weather_af,
             weather_am:checkweatherResult[0].weather_am
         }

@@ -22,7 +22,7 @@ router.get('/', async function(req, res){
         let user_idx = decoded.user_idx;
         let style = [];
         //개인 정보 보여주기
-        let showUserQuery = 'SELECT user_img, user_id, user_desc, user_age, user_height, user_weight FROM user WHERE user_idx = ?';
+        let showUserQuery = 'SELECT user_img, user_id, user_gender, user_desc, user_age, user_height, user_weight FROM user WHERE user_idx = ?';
         let showUserResult = await db.queryParam_Arr(showUserQuery, [user_idx]);
 
         let showUserStyle = 'SELECT style_type FROM style JOIN user_style USING(style_idx) WHERE user_idx = ?';
@@ -54,7 +54,7 @@ router.put('/',upload.single('user_img'), async function(req, res){
     let token = req.headers.token; 
     let decoded = jwt.verify(token);
     let user_img;
-
+    let user_idx;
     //토큰 없을시 오류 
     if (decoded == -1){
         res.status(500).send({
@@ -62,13 +62,14 @@ router.put('/',upload.single('user_img'), async function(req, res){
         }); 
     }
     else {
-        let user_idx = decoded.user_idx;
+        user_idx = decoded.user_idx;
         let user_age = req.body.user_age;
         let user_desc = req.body.user_desc;
         let user_height =  req.body.user_height;
         let user_weight = req.body.user_weight;
         let user_gender = req.body.user_gender;
         let user_stylelist= req.body.user_stylelist;
+        console.log(user_stylelist);
         if(req.file){
             user_img = req.file.location;
         }
@@ -80,16 +81,16 @@ router.put('/',upload.single('user_img'), async function(req, res){
                 res.status(500).send({
                     message : "Internal Server Error"
                 }); 
-            }else{
+            }/*else{
             res.status(201).send({
                 message : "Successfully user Updated",
                 data : {
                     user_idx : user_idx,
                     user_desc : user_desc
                 }
-            });
+            });*/
         }
-        }
+        //}
 
         if(user_gender){
             let updateGender = 'UPDATE user SET user_gender = ? WHERE user_idx =?';
@@ -99,16 +100,16 @@ router.put('/',upload.single('user_img'), async function(req, res){
                 res.status(500).send({
                     message : "Internal Server Error"
                 }); 
-            }else{
+            }/*else{
             res.status(201).send({
                 message : "Successfully user Updated",
                 data : {
                     user_idx : user_idx,
                     user_gender : user_gender
                 }
-            });
+            });*/
         }
-        }
+        //}
         
         
 
@@ -121,16 +122,16 @@ router.put('/',upload.single('user_img'), async function(req, res){
                 res.status(500).send({
                     message : "Internal Server Error"
                 }); 
-            }else{
+            }/*else{
             res.status(201).send({
                 message : "Successfully user Updated",
                 data : {
                     user_idx : user_idx,
                     user_age : user_age
                 }
-            });
+            });*/
         }
-        }
+        //}
 
         if(user_img){
             let updateImg = 'UPDATE user SET user_img = ? WHERE user_idx =?';
@@ -140,16 +141,16 @@ router.put('/',upload.single('user_img'), async function(req, res){
                 res.status(500).send({
                     message : "Internal Server Error"
                 }); 
-            }else{
+            }/*else{
             res.status(201).send({
                 message : "Successfully user Updated",
                 data : {
                     user_idx : user_idx,
                     user_img : user_img
                 }
-            });
+            });*/
         }
-        }
+        //}
 
         if(user_height){
             let updateHeight = 'UPDATE user SET user_height = ? WHERE user_idx =?';
@@ -159,16 +160,16 @@ router.put('/',upload.single('user_img'), async function(req, res){
                 res.status(500).send({
                     message : "Internal Server Error"
                 }); 
-            }else{
+            }/*else{
             res.status(201).send({
                 message : "Successfully user Updated",
                 data : {
                     user_idx : user_idx,
                     user_height : user_height
                 }
-            });
+            });*/
         }
-        }
+        //}
 
         if(user_weight){
             let updateWeight = 'UPDATE user SET user_weight = ? WHERE user_idx =?';
@@ -178,49 +179,66 @@ router.put('/',upload.single('user_img'), async function(req, res){
                 res.status(500).send({
                     message : "Internal Server Error"
                 }); 
-            }else{
+            }/*else{
             res.status(201).send({
                 message : "Successfully user Updated",
                 data : {
                     user_idx : user_idx,
                     user_weight : user_weight
                 }
-            });
+            });*/
         }
-    }
-            if(user_stylelist){
+        console.log(user_stylelist);
+        if(user_stylelist){
             let deleteUserStyle = 'DELETE FROM user_style WHERE user_idx = ?'
             let deleteUserStyleResult = await db.queryParam_Arr(deleteUserStyle, [user_idx]);
 
             for(var i=0;i<user_stylelist.length;i++){ //유저와 스타일 등록
+                console.log(user_stylelist[i]);
                 let settingStyleQuery= "SELECT style_idx FROM style WHERE style_type= ?";
                 let settingStyleResult = await db.queryParam_Arr(settingStyleQuery,user_stylelist[i]);
+                if(!settingStyleResult){ //쿼리 에러 
+                    res.status(400).send({
+                        message : "don't have that style"
+                    }); 
+                }
                 let styleindex=parseInt(settingStyleResult[0].style_idx,10);
 
                 let updateStyleQuery="INSERT INTO user_style (user_idx, style_idx) VALUES(?,?)";
                 let updateStyleResult = await db.queryParam_Arr(updateStyleQuery,[user_idx, styleindex]);
 
-                if(!settingStyleResult || !updateStyleResult || !deleteUserStyleResult){ //쿼리 에러 
+                if( !updateStyleResult || !deleteUserStyleResult){ //쿼리 에러 
                     res.status(500).send({
                         message : "Internal Server Error, failed to insert style"
                     }); 
                 }
             }
-            if(!updateStyleResult){
-                res.status(500).send({
-                    message : "Internal Server Error"
-                }); 
-            }else{
+            
+        }
+    }
+        let updateUser='select user_img,user_id,user_gender,user_desc,user_age,user_height,user_weight from user where user_idx=?';
+        let updateUserResult=await db.queryParam_Arr(updateUser,[user_idx]);
+
+        let updateStyle='select style_type from style where style_idx in(select style_idx from user_style where user_idx=?)';
+        let updateResult=await db.queryParam_Arr(updateStyle,[user_idx]);
+        let style__list=[];
+        
+        for(var i=0;i<updateResult.length;i++){
+            style__list.push(updateResult[i].style_type);
+        }
+        if(!updateUserResult){
+            res.status(500).send({
+                message : "Internal Server Error"
+            }); 
+        }else{
             res.status(201).send({
                 message : "Successfully user Updated",
                 data : {
-                    user_idx : user_idx,
-                    user_stylelist : user_stylelist
+                    showUserResult : updateUserResult,
+                    style : style__list
                 }
             });
         }
-        }
-    }
 });
 
 
