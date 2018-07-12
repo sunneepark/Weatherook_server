@@ -206,19 +206,6 @@ router.put('/',upload.single('user_img'), async function(req, res){
                     }); 
                 }
             }
-            if(!updateStyleResult){
-                res.status(500).send({
-                    message : "Internal Server Error"
-                }); 
-            }/*else{
-            res.status(201).send({
-                message : "Successfully user Updated",
-                data : {
-                    user_idx : user_idx,
-                    user_stylelist : user_stylelist
-                }
-            });
-            }*/
             
         }
     }
