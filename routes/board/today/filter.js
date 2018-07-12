@@ -6,6 +6,19 @@ const jwt = require('../../../module/jwt.js');
 const moment = require('moment');
 
 router.post('/', async function(req, res){
+    let token = req.headers.token; 
+    let user_user_idx;
+    if(token){
+        let decoded = jwt.verify(token);
+    
+        if (decoded == -1){
+            res.status(500).send({
+                message : "Token error"
+            }); 
+        }
+        user_user_idx = decoded.user_idx;
+    }
+
     let board_day = moment().format('2018-07-01');
     let start_day = board_day.concat(' 00:00:00'); 
     let end_day = board_day.concat(' 23:59:59');
@@ -76,7 +89,7 @@ router.post('/', async function(req, res){
         let board_idx = real_board_idx[i]; 
         let comment_idx;
         let comment_arr = [];
-        
+        let like_flag=0;
         if(!board_idx){
             res.status(400).send({
                 message : "Null Value"
@@ -99,6 +112,15 @@ router.post('/', async function(req, res){
             let checkCommentInBoard = 'SELECT * FROM board_comment WHERE board_idx = ?'; 
             let checkCommentInBoardRes = await db.queryParam_Arr(checkCommentInBoard, [board_idx]); 
             
+            if(user_user_idx){
+                console.log(user_user_idx);
+                //like flag를 가져오기 위한 user 테이블 비교
+                let checkLikeInBoard = 'select * from weatherook.like where user_idx = ? and like_idx in (select like_idx from board_like where board_idx=?);'; 
+                let checkLikeInBoardRes = await db.queryParam_Arr(checkLikeInBoard, [user_user_idx, board_idx]); 
+                console.log(checkLikeInBoardRes);
+                if(checkLikeInBoardRes.length>0) like_flag=1;
+            }
+
             if(!getBoardInFilterRes || !getUserImgInFilterRes || !getLikeCntInFilterRes || !checkCommentInBoardRes){
                 res.status(500).send({
                     message : "Internal Server Error"
@@ -156,6 +178,7 @@ router.post('/', async function(req, res){
                 board_desc : getBoardInFilterRes[0].board_desc, 
                 //hashtag_desc : hashtag_desc, 
                 like_cnt : getLikeCntInFilterRes[0].count, 
+                like_flag : like_flag,
                 board_temp_min : getBoardInFilterRes[0].board_temp_min, 
                 board_temp_max : getBoardInFilterRes[0].board_temp_max,
                 board_weather : getBoardInFilterRes[0].board_weather,

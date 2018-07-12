@@ -40,6 +40,7 @@ router.post('/', async function(req, res){
         }
         else{
             for(var k=0;k<checkfollowResult.length;k++){
+                let like_flag=0;
                 let board_idx=checkfollowResult[k].board_idx;
                 let comment_idx;
                 let comment_arr = []; 
@@ -68,7 +69,12 @@ router.post('/', async function(req, res){
                     //comment를 가져오기 위한 board_comment와 comment 테이블 접근
                     let checkCommentInBoard = 'SELECT * FROM board_comment WHERE board_idx = ?'; 
                     let checkCommentInBoardRes = await db.queryParam_Arr(checkCommentInBoard, [board_idx]); 
-                    
+                    if(user_idx){
+                        //like flag를 가져오기 위한 user 테이블 비교
+                        let checkLikeInBoard = 'select * from weatherook.like where user_idx = ? and like_idx in (select like_idx from board_like where board_idx=?);'; 
+                        let checkLikeInBoardRes = await db.queryParam_Arr(checkLikeInBoard, [user_idx, board_idx]); 
+                        if(checkLikeInBoardRes.length>0) like_flag=1;
+                    }
                     if(!checkCommentInBoardRes || !selectOneBoardResult || !selectWriterOneBoardResult || !selectLikesCntResult){
                         res.status(500).send({
                             message : "Internal Server Error"
@@ -124,6 +130,7 @@ router.post('/', async function(req, res){
                         board_desc : selectOneBoardResult[0].board_desc, 
                         //hashtag_desc : hashtag_desc, 
                         like_cnt : selectLikesCntResult[0].count, 
+                        like_flag : like_flag,
                         board_temp_min : selectOneBoardResult[0].board_temp_min, 
                         board_temp_max : selectOneBoardResult[0].board_temp_max,
                         board_weather : selectOneBoardResult[0].board_weather,
