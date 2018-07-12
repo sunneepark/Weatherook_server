@@ -12,7 +12,7 @@ router.post('/',upload.single('board_img'), async function(req, res){
     let board_desc = req.body.board_desc;
     
     let board_weather=req.body.board_weather;
-    let board_temp_min=req.body.board_weather_min;
+    let board_temp_min=req.body.board_temp_min;
     let board_temp_max=req.body.board_temp_max;
     let board_auth = req.body.board_auth;
     let style_type = req.body.board_stylelist;
