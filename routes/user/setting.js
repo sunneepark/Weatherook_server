@@ -228,6 +228,7 @@ router.put('/',upload.single('user_img'), async function(req, res){
         let updateStyle='select style_type from style where style_idx in(select style_idx from user_style where user_idx=?)';
         let updateResult=await db.queryParam_Arr(updateStyle,[user_idx]);
         let style__list=[];
+        
         for(var i=0;i<updateResult.length;i++){
             style__list.push(updateResult[i].style_type);
         }
@@ -236,12 +237,10 @@ router.put('/',upload.single('user_img'), async function(req, res){
                 message : "Internal Server Error"
             }); 
         }else{
-            
             res.status(201).send({
                 message : "Successfully user Updated",
                 data : {
-                    user_idx : user_idx,
-                    showUserResult : updateUserResult[0],
+                    showUserResult : updateUserResult,
                     style : style__list
                 }
             });
