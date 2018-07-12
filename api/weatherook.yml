@@ -4,53 +4,2093 @@ info:
   version: "1.0"
   description: "project weatherook's server API"
 
-host: https://weatherook.cf
+host: weatherook.cf
 basePath: /api/v1.0
 schemes:
   - http
   - https
 paths:
-    /account/signin/app:
+
+  /auth:
     post:
-      summary: signin(alex)
-      description: signin
+      summary: 회원가입
+      description: 회원가입하는 곳
       consumes:
-        - application/x-www-form-urlencoded
+        - application/json
       tags:
-        - account
+        - auth
       parameters:
         - in: body
           name : data
-          schema:
+          schema:   
             type: object
             required:
-              - email
-              - password
+              - user_id
+              - user_pw
+              - user_gender
+              - user_age
+              - user_height
+              - user_weight
+              - user_stylelist
             properties:
-              email:
+              user_id:
                 type: string
-                example : dla1635@gmail.com
-              password:
+                example : jambamc
+              user_pw:
                 type: string
-                example : "1234"
+                example : 123qwe  
+              user_gender:
+                type: string
+                example: 남
+              user_age:
+                type: integer
+                example: 22
+              user_height:
+                type: integer
+                example: 178
+              user_weight:
+                type: integer
+                example: 73
+              user_stylelist:
+                type: array
+                items:
+                  type: string
+                example: ["댄디", "유스"]
       responses:
-        200:
-          description: status code 200
+        201:
+          description: status code 201
           schema:
-            $ref: "#/definitions/200_account_signin_app"
+            $ref: '#/definitions/201_auth_signup'
+        400:
+          description: status code 400
+          schema:
+            $ref: '#/definitions/400_error'
+        500:
+          description: status code 500
+          schema:
+            $ref: '#/definitions/500_error'
 
-            
-definitions:
-  
-    200_account_signin_app:
-        type: object
-        properties:
-          message:
-            type: string
-            example: "Sucessfully signin!!" 
-          data:
+    delete:
+      summary: 게정삭제
+      description: 계정삭제하는 곳
+      consumes:
+        - application/json
+      tags:
+        - auth
+      parameters:
+        - in: body
+          name : data
+          schema:   
             type: object
+            required:
+              - user_id
+              - user_pw
+            properties:
+              user_id:
+                type: string
+                example : jambamc
+              user_pw:
+                type: string
+                example : 123qwe 
+      responses:
+        201:
+          description: status code 201
+          schema:
+            $ref: '#/definitions/201_auth_delete'
+        400:
+          description: status code 400
+          schema:
+            $ref: '#/definitions/400_error'
+        500:
+          description: status code 500
+          schema:
+            $ref: '#/definitions/500_error'
+
+
+  /auth/signin:
+    post:
+      summary: 로그인
+      description: 로그인하는 곳
+      consumes:
+        - application/json
+      tags:
+        - auth
+      parameters:
+        - in: body
+          name : data
+          schema:   
+            type: object
+            required:
+              - user_id
+              - user_pw
+            properties:
+              user_id:
+                type: string
+                example : jambamc
+              user_pw:
+                type: string
+                example : 123qwe 
+      responses:
+        201:
+          description: status code 201
+          schema:
+            $ref: '#/definitions/201_auth_signin'
+        400:
+          description: status code 400
+          schema:
+            $ref: '#/definitions/403_error'
+        500:
+          description: status code 500
+          schema:
+            $ref: '#/definitions/500_error'
+  
+  /board:
+    post:
+      summary: 게시글 등록
+      description: 게시글 등록하는 곳
+      consumes:
+        - application/form-data
+      tags:
+        - board
+      parameters:
+        - in: header
+          name : token
+          schema:   
+            type: object
+            required:
+              - user_token
             properties:
               token:
                 type: string
-                example : "asdsd@#as.d@#$kfoke;w/.!@#asd#"
+                example : "asdas!@#$.asdjhqiuddkwq^%&%#$,!@#"
+        - in: body
+          name: data
+          description:  board_weather, board_temp_min, board_temp_max는 서버에서 날씨와 최저/최고 온도 뿌려준것을 활용하세요!
+            
+            board_weather는 0:맑음, 1:구름 조금 2:구름 많음, 3:흐림 4:비 5:비/눈 6:눈
+          schema:
+            type: object
+            required: 
+              - board_img
+              - board_desc
+              - x
+              - y
+              - board_auth
+              - board_stylelist
+              - board_weather
+              - board_temp_min
+              - board_temp_max
+            properties:
+              board_img: 
+                type: string
+                example: https://s3.ap-northeast-2.amazonaws.com/weatherook/xxx.jpeg
+              board_desc:
+                type: string
+                example: 오늘 날씨 완전 좋아 ㅎㅎ
+              x:
+                type: number
+                example: 37.579871128849334
+              y:
+                type: number
+                example: 126.98935225645432
+              board_auth:
+                type: string
+                example: PUBLIC
+              board_stylelist:
+                type: array
+                items:
+                  type: string
+                example: 유스, 댄디
+              board_weather:
+                type: integer
+                example: 0
+              board_temp_min:
+                type: integer
+                example: 20
+              board_temp_max:
+                type: integer
+                example: 25
+
+      responses:
+        201:
+          description: status code 201
+          schema:
+            $ref: '#/definitions/201_board'
+        400:
+          description: status code 400
+          schema:
+            $ref: '#/definitions/400_error'
+        500:
+          description: status code 500
+          schema:
+            $ref: '#/definitions/500_error'
+            
+    delete:
+      summary: 게시글 삭제
+      description: 게시글 삭제하는 곳
+      consumes:
+        - application/json
+      tags:
+        - board
+      parameters:
+        - in: header
+          name: token
+          schema:
+            type: object
+            required: 
+              - user_token
+            properties:
+              token:
+                type: string
+                example: "asdas!@#$.asdjhqiuddkwq^%&%#$,!@#"
+        - in: body
+          name : data
+          schema:   
+            type: object
+            required:
+              - board_idx
+            properties:
+              board_idx:
+                type: integer
+                example : 42
+
+      responses:
+        201:
+          description: status code 201
+          schema:
+            $ref: '#/definitions/201_board_delete'
+        400:
+          description: status code 400
+          schema:
+            $ref: '#/definitions/400_error'
+        500:
+          description: status code 500
+          schema:
+            $ref: '#/definitions/500_error'
+            
+  /board/{board_idx}:
+    get:
+      summary: 하나의 게시물 조회
+      description: 하나의 게시물 조회하는 곳
+      
+                   게시글의 달린 comment의 수 >2는 
+                   flag=1
+                   
+                   comment의 수 <=2는 flag =0
+      consumes:
+        - application/json
+      tags:
+        - board
+      parameters:
+        - in: path
+          name : board_idx
+          required: true
+          type: integer
+    
+      responses:
+        201:
+          description: status code 201
+          schema:
+            $ref: '#/definitions/201_board_get'
+        400:
+          description: status code 400
+          schema:
+            $ref: '#/definitions/400_error'
+        500:
+          description: status code 500
+          schema:
+            $ref: '#/definitions/500_error' 
+            
+  /board/like:
+    post:
+      summary: 게시글 좋아요
+      description: 게시글 좋아요
+      consumes:
+        - application/json
+      tags:
+      - board
+      parameters: 
+        - in: header
+          name: token
+          schema:
+            type: object
+            required: 
+              - user_token
+            properties:
+              token:
+                type: string
+                example: "asdas!@#$.asdjhqiuddkwq^%&%#$,!@#"
+        - in: body
+          name: data
+          description: 같은 게시물 또 좋아요 누르면 delete됩니다!
+          schema:
+            type: object
+            required: 
+              - board_idx
+            properties:
+              board_idx:
+                type: integer
+                example: 34
+        
+      responses:
+        201:
+          description: status code 201
+          schema:
+            $ref: '#/definitions/201_board_like'
+        400:
+          description: status code 400
+          schema:
+            $ref: '#/definitions/400_error'
+        500:
+          description: status code 500
+          schema:
+            $ref: '#/definitions/500_error'
+            
+  /board/commend:
+    post:
+      summary: 추천 게시글
+      description: "오늘 날씨에 추천할 만한 게시글(쇼핑몰) 조회"
+      consumes:
+        - application/json
+      tags:
+      - board
+      parameters: 
+        - in: header
+          name: token
+          schema:
+            type: object
+            required: 
+              - user_token
+            properties:
+              token:
+                type: string
+                example: "asdas!@#$.asdjhqiuddkwq^%&%#$,!@#"
+        - in: body
+          name: data
+          description: "위도 경도, date_type:(2:오늘 3:내일)"
+          schema:
+            type: object
+            required: 
+              - x
+              - y
+              - date_type
+            properties:
+              x:
+                type: number
+                example: 37.579871128849334
+              y:
+                type: number
+                example: 126.98935225645432
+              date_type:
+                type: integer
+                example: 2
+        
+      responses:
+        201:
+          description: status code 201
+          schema:
+            $ref: '#/definitions/201_board_commend_post'
+        400:
+          description: status code 400
+          schema:
+            $ref: '#/definitions/400_error'
+        500:
+          description: status code 500
+          schema:
+            $ref: '#/definitions/500_error'
+            
+  /board/today/popular:
+    get:
+      summary: "오늘 게시글 인기순 조회"
+      description: "오늘 올라온 게시글 인기순 조회"
+      consumes:
+        - application/json
+      tags:
+      - board_today
+      responses:
+        201:
+          description: status code 201
+          schema:
+            $ref: '#/definitions/201_board_popular_get'
+        400:
+          description: status code 400
+          schema:
+            $ref: '#/definitions/400_error'
+        500:
+          description: status code 500
+          schema:
+            $ref: '#/definitions/500_error'
+            
+  /board/today/latest:
+    get:
+      summary: 오늘 게시글 최신순 조회 
+      description: "오늘 올라온 게시글 최신순 조회"
+      consumes:
+        - application/json
+      tags:
+      - board_today
+
+      responses:
+        201:
+          description: status code 201
+          schema:
+            $ref: '#/definitions/201_board_latest_get'
+        400:
+          description: status code 400
+          schema:
+            $ref: '#/definitions/400_error'
+        500:
+          description: status code 500
+          schema:
+            $ref: '#/definitions/500_error'
+            
+  /board/today/filter:
+    post:
+      summary: 오늘 게시물 필터링
+      description: "오늘 게시물 필터링"
+      consumes:
+        - application/json
+      tags:
+      - board_today
+      parameters: 
+        - in: body
+          name: data
+          schema:
+            type: object
+            required: 
+              - gender
+              - height
+              - size
+              - stylelist
+            properties:
+              gender:
+                type: string
+                example: "여"
+              height:
+                type: integer
+                example: 160
+              size:
+                type: string
+                example: "보통"
+              stylelist:
+                type: array
+                items:
+                  type: string
+                example: "로맨틱, 빈티지"
+
+      responses:
+        201:
+          description: status code 201
+          schema:
+            $ref: '#/definitions/201_board_today_filter_post'
+        400:
+          description: status code 400
+          schema:
+            $ref: '#/definitions/400_error'
+        500:
+          description: status code 500
+          schema:
+            $ref: '#/definitions/500_error'
+            
+  /board/follow:
+    get:
+      summary: 팔로우 게시글
+      description: 나의 팔로워 게시글 조회
+      consumes:
+        - application/json
+      tags:
+      - board
+      parameters: 
+        - in: header
+          name: token
+          schema:
+            type: object
+            required: 
+              - user_token
+            properties:
+              token:
+                type: string
+                example: "asdas!@#$.asdjhqiuddkwq^%&%#$,!@#"
+
+      responses:
+        201:
+          description: status code 201
+          schema:
+            $ref: '#/definitions/201_board_follow_get'
+        400:
+          description: status code 400
+          schema:
+            $ref: '#/definitions/400_error'
+        500:
+          description: status code 500
+          schema:
+            $ref: '#/definitions/500_error'
+            
+  /board/filter:
+    post:
+      summary: 전체 게시물 필터링
+      description: "데이터가 적어서 필터 해도 데이터 안 나올 수 있음 0:맑음, 1:구름 조금 2:구름 많음, 3:흐림 4:비 5:비/눈 6:눈"
+      consumes:
+        - application/json
+      tags:
+      - board
+      parameters: 
+        - in: body
+          name: data
+          schema:
+            type: object
+            required: 
+              - gender
+              - height
+              - size
+              - temp
+              - weather
+              - stylelist
+            properties:
+              gender:
+                type: string
+                example: "여"
+              height:
+                type: integer
+                example: 160
+              size:
+                type: string
+                example: "보통"
+              temp:
+                type: integer
+                example: 26
+              weather:
+                type: integer
+                example: 0
+              comment_desc:
+                type: string
+                example: "날씨에 어울리는 옷이네요~"
+              stylelist:
+                type: array
+                items:
+                  type: string
+                example: "로맨틱, 빈티지"
+
+      responses:
+        201:
+          description: status code 201
+          schema:
+            $ref: '#/definitions/201_board_filter_post'
+        400:
+          description: status code 400
+          schema:
+            $ref: '#/definitions/400_error'
+        500:
+          description: status code 500
+          schema:
+            $ref: '#/definitions/500_error'
+  
+
+  /board/comment:
+    post:
+      summary: 게시글 댓글
+      description: 게시글 댓글 등록할때
+      consumes:
+        - application/json
+      tags:
+      - comment
+      parameters: 
+        - in: header
+          name: token
+          schema:
+            type: object
+            required: 
+              - user_token
+            properties:
+              token:
+                type: string
+                example: "asdas!@#$.asdjhqiuddkwq^%&%#$,!@#"
+        - in: body
+          name: data
+          schema:
+            type: object
+            required: 
+              - board_idx
+              - comment_desc
+            properties:
+              board_idx:
+                type: integer
+                example: 34
+              comment_desc:
+                type: string
+                example: "날씨에 어울리는 옷이네요~"
+        
+      responses:
+        201:
+          description: status code 201
+          schema:
+            $ref: '#/definitions/201_board_comment'
+        400:
+          description: status code 400
+          schema:
+            $ref: '#/definitions/400_error'
+        500:
+          description: status code 500
+          schema:
+            $ref: '#/definitions/500_error' 
+            
+    delete:
+      summary: 댓글 삭제
+      description: 댓글 삭제하는 곳
+      consumes:
+        - application/json
+      tags:
+        - comment
+      parameters:
+        - in: header
+          name : token
+          schema:   
+            type: object
+            required:
+              - user_token
+            properties:
+              token:
+                type: string
+                example : "asdas!@#$.asdjhqiuddkwq^%&%#$,!@#"
+        - in: body
+          name : data
+          schema:   
+            type: object
+            required:
+              - board_idx
+              - comment_idx
+            properties:
+              board_idx:
+                type: integer
+                example : 7
+              comment_idx:
+                type: integer
+                example : 34
+      responses:
+        201:
+          description: status code 201
+          schema:
+            $ref: '#/definitions/201_board_comment_delete'
+        400:
+          description: status code 400
+          schema:
+            $ref: '#/definitions/400_error'
+        500:
+          description: status code 500
+          schema:
+            $ref: '#/definitions/500_error'
+
+            
+  /board/comment/{board_idx}:
+    put:
+      summary: 게시글 댓글 수정
+      description: 게시글 댓글 수정할 때
+      consumes:
+        - application/json
+      tags:
+      - comment
+      parameters: 
+        - in: path
+          name: board_idx
+          required: true
+          type: integer
+        - in: header
+          name: token
+          schema:
+            type: object
+            required: 
+              - user_token
+            properties:
+              token:
+                type: string
+                example: "asdas!@#$.asdjhqiuddkwq^%&%#$,!@#"
+        - in: body
+          name: data
+          schema:
+            type: object
+            required: 
+              - board_idx
+              - comment_desc
+              - comment_idx
+            properties:
+              board_idx:
+                type: integer
+                example: 34
+              comment_desc:
+                type: string
+                example: "날씨에 어울리는 옷이네요~"
+              comment_idx:
+                type: integer
+                example: 104
+      responses:
+        201:
+          description: status code 201
+          schema:
+            $ref: '#/definitions/201_board_comment_put'
+        400:
+          description: status code 400
+          schema:
+            $ref: '#/definitions/400_error'
+        500:
+          description: status code 500
+          schema:
+            $ref: '#/definitions/500_error' 
+    get:
+      summary: 게시글 댓글 조회
+      consumes:
+        - application/json
+      tags:
+        - comment
+      parameters:
+        - in: path
+          name : board_idx
+          required: true
+          type: integer
+        - in: body
+          name: data
+          schema:
+            type: object
+            required: 
+              - comment_idx
+              - board_idx
+            properties:
+              comment_idx:
+                type: integer
+                example: 5
+              board_idx:
+                type: integer
+                example: 4
+                
+      responses:
+        201:
+          description: status code 201
+          schema:
+            $ref: '#/definitions/201_board_comment_get'
+        400:
+          description: status code 400
+          schema:
+            $ref: '#/definitions/400_error'
+        500:
+          description: status code 500
+          schema:
+            $ref: '#/definitions/500_error' 
+
+  /weather:
+    post:
+      summary: "날씨 보여주기"
+      description: "해당 날짜에 맞는 날씨 보여주기 , 날씨 get "
+      consumes:
+        - application/json
+      tags:
+        - weather
+      parameters:
+        - in: body
+          name : data
+          description: "data_type: (어제 : 1, 오늘 : 2, 내일 :3)"
+          schema:   
+            type: object
+            required:
+              - x
+              - y
+              - date_type
+            properties:
+              x:
+                type: number
+                example : 37.579871128849334
+              y:
+                type: number
+                example : 126.98935225645432  
+              date_type:
+                type: integer
+                example: 1
+  
+      responses:
+        201:
+          description: status code 201
+          schema:
+            $ref: '#/definitions/201_weather_post'
+        400:
+          description: status code 400
+          schema:
+            $ref: '#/definitions/400_error'
+        500:
+          description: status code 500
+          schema:
+            $ref: '#/definitions/500_error'
+  
+  /weather/web:
+    get:
+      summary: "날씨 보여주기_웹"
+      description: "오늘 날씨랑 유저 이미지 보여주기"
+      consumes:
+        - application/json
+      tags:
+        - weather
+      parameters:
+        - in: header
+          name : token
+          schema:   
+            type: object
+            required:
+              - user_token
+            properties:
+              user_token:
+                type: string
+                example : "asdas!@#$.asdjhqiuddkwq^%&%#$,!@#"
+  
+      responses:
+        201:
+          description: status code 201
+          schema:
+            $ref: '#/definitions/201_weather_web_get'
+        400:
+          description: status code 400
+          schema:
+            $ref: '#/definitions/400_error'
+        500:
+          description: status code 500
+          schema:
+            $ref: '#/definitions/500_error'
+            
+  /weather/list:
+    post:
+      summary: "날씨3시간간격"
+      description: "날씨 3시간 간격으로 6개 보여주기"
+      consumes:
+        - application/json
+      tags:
+        - weather
+      parameters:
+        - in: body
+          name : data
+          description: "날씨를 알고 싶은 지역의 위도, 경도"
+          schema:   
+            type: object
+            required:
+              - x
+              - y
+            properties:
+              x:
+                type: number
+                example : 37.579871128849334
+              y:
+                type: number
+                example : 126.98935225645432  
+ 
+      responses:
+        201:
+          description: status code 201
+          schema:
+            $ref: '#/definitions/201_weather_list_post'
+        400:
+          description: status code 400
+          schema:
+            $ref: '#/definitions/400_error'
+        500:
+          description: status code 500
+          schema:
+            $ref: '#/definitions/500_error'
+    
+  /weather/comment:
+    post:
+      summary: "날씨감성글"
+      description: "날씨에 따른 감성글"
+      consumes:
+        - application/json
+      tags:
+        - weather
+      parameters:
+        - in: body
+          name : data
+          schema:   
+            type: object
+            required:
+              - weather_temp
+              - weather_weather
+            properties:
+              weather_temp:
+                type: integer
+                example : 23
+              weather_weather:
+                description: "0:맑음, 1:구름 조금 2:구름 많음, 3:흐림 4:비 5:비/눈 6:눈"
+                type: integer
+                example : 3
+ 
+      responses:
+        201:
+          description: status code 201
+          schema:
+            $ref: '#/definitions/201_weather_comment_post'
+        400:
+          description: status code 400
+          schema:
+            $ref: '#/definitions/400_error'
+        500:
+          description: status code 500
+          schema:
+            $ref: '#/definitions/500_error'
+
+  /user/news:
+    get:
+      summary: "내 소식"
+      description: "내 소식 (누가 내 게시물 좋아요 눌렀는지 등 확인) flag =0 (댓글) flag=1(팔로워)"
+      consumes:
+        - application/json
+      tags:
+        - user
+      parameters:
+        - in: header
+          name : token
+          schema:   
+            type: object
+            required:
+              - user_token
+            properties:
+              token:
+                type: string
+                example : "asdas!@#$.asdjhqiuddkwq^%&%#$,!@#"
+      responses:
+        201:
+          description: status code 201
+          schema:
+            $ref: '#/definitions/201_user_news_get'
+        400:
+          description: status code 400
+          schema:
+            $ref: '#/definitions/400_error'
+        500:
+          description: status code 500
+          schema:
+            $ref: '#/definitions/500_error'
+            
+  /user/follow:
+    post:
+      summary: "팔로우하기"
+      description: "유저가 다른 유저의 팔로우 버튼을 눌렀을 때"
+      consumes:
+        - application/json
+      tags:
+        - user
+      parameters:
+        - in: header
+          name : token
+          schema:   
+            type: object
+            required:
+              - user_token
+            properties:
+              token:
+                type: string
+                example : "asdas!@#$.asdjhqiuddkwq^%&%#$,!@#"
+        - in: body
+          name : data
+          schema:   
+            type: object
+            required:
+              - follower_id
+            properties:
+              follower_id:
+                type: string
+                example : "minkyoe"
+                description: "팔로우 당하는 유저의 아이디"
+                
+                
+      responses:
+        201:
+          description: status code 201
+          schema:
+            $ref: '#/definitions/201_user_follow_post'
+        400:
+          description: status code 400
+          schema:
+            $ref: '#/definitions/400_error'
+        500:
+          description: status code 500
+          schema:
+            $ref: '#/definitions/500_error'
+            
+            
+  /user/show:
+    post:
+      summary: 유저 페이지 보여주기 
+      description: 유저 페이지 보여주는 곳
+      consumes:
+        - application/json
+      tags:
+        - user
+      parameters:
+        - in: header
+          name : token
+          schema:   
+            type: object
+            required:
+              - user_token
+            properties:
+              token:
+                type: string
+                example : "asdas!@#$.asdjhqiuddkwq^%&%#$,!@#"
+        - in: body
+          name: data
+          description:  "다른 유저의 페이지 보고 싶을때(클릭했을때)는 넣어주고 자기 자신만 보고 싶으면 아무것도 안 넣어주면 되여 ex)drifin94"
+          schema:
+            type: object
+            required: 
+              - other_id
+            properties:
+              other_id: 
+                type: string
+                example: "drifin94"
+ 
+
+      responses:
+        201:
+          description: status code 201
+          schema:
+            $ref: '#/definitions/201_user_show'
+        400:
+          description: status code 400
+          schema:
+            $ref: '#/definitions/400_error'
+        500:
+          description: status code 500
+          schema:
+            $ref: '#/definitions/500_error'
+            
+  /user/follower:
+    get:
+      summary: 유저 팔로워 리스트
+      description: 유저 팔로워 리스트 보여주기
+      consumes:
+        - application/json
+      tags:
+        - user
+      parameters:
+        - in: header
+          name : token
+          schema:   
+            type: object
+            required:
+              - user_token
+            properties:
+              token:
+                type: string
+                example : "asdas!@#$.asdjhqiuddkwq^%&%#$,!@#"
+
+      responses:
+        201:
+          description: status code 201
+          schema:
+            $ref: '#/definitions/201_user_follower_get'
+        400:
+          description: status code 400
+          schema:
+            $ref: '#/definitions/400_error'
+        500:
+          description: status code 500
+          schema:
+            $ref: '#/definitions/500_error'
+            
+  /user/following:
+    get:
+      summary: 유저 팔로잉 리스트
+      description: 유저 팔로잉 리스트 보여주기
+      consumes:
+        - application/json
+      tags:
+        - user
+      parameters:
+        - in: header
+          name : token
+          schema:   
+            type: object
+            required:
+              - user_token
+            properties:
+              token:
+                type: string
+                example : "asdas!@#$.asdjhqiuddkwq^%&%#$,!@#"
+
+      responses:
+        201:
+          description: status code 201
+          schema:
+            $ref: '#/definitions/201_user_following_get'
+        400:
+          description: status code 400
+          schema:
+            $ref: '#/definitions/400_error'
+        500:
+          description: status code 500
+          schema:
+            $ref: '#/definitions/500_error'
+            
+  /user/setting/{user_idx}:
+    put:
+      summary: 개인 정보 수정
+      description: 게시글 등록하는 곳
+      consumes:
+        - application/form-data
+      tags:
+        - user
+      parameters:
+        - in: path
+          name : user_idx
+          required: true
+          type: integer
+        - in: header
+          name : token
+          schema:   
+            type: object
+            required:
+              - user_token
+            properties:
+              token:
+                type: string
+                example : "asdas!@#$.asdjhqiuddkwq^%&%#$,!@#"
+        - in: body
+          name: data
+          schema:
+            type: object
+            required: 
+              - user_desc
+              - user_gender
+              - user_age
+              - user_img
+              - user_height
+              - user_weight
+              - user_stylelist
+            properties:
+              user_desc: 
+                type: string
+                example: "Daily Look!"
+              user_gender:
+                type: string
+                example: 남
+              user_age:
+                type: integer
+                example: 27
+              user_img:
+                type: string
+                example: "https://weatherook.s3.ap-northeast-2.amazonaws.com/xxx.png"
+              user_height:
+                type: integer
+                example: 182
+              user_weight:
+                type: integer
+                example: 68
+              user_stylelist:
+                type: array
+                items:
+                  type: string
+                example: 유스, 댄디
+                
+            
+      responses:
+        201:
+          description: status code 201
+          schema:
+            $ref: '#/definitions/201_user_setting_put'
+        400:
+          description: status code 400
+          schema:
+            $ref: '#/definitions/400_error'
+        500:
+          description: status code 500
+          schema:
+            $ref: '#/definitions/500_error'
+            
+  /user/setting:
+    get:
+      summary: 개인 정보 설정
+      description: 개인 정보 설정 메인 화면
+      consumes:
+        - application/json
+      tags:
+        - user
+      parameters:
+        - in: header
+          name : token
+          schema:   
+            type: object
+            required:
+              - user_token
+            properties:
+              token:
+                type: string
+                example : "asdas!@#$.asdjhqiuddkwq^%&%#$,!@#"
+
+      responses:
+        201:
+          description: status code 201
+          schema:
+            $ref: '#/definitions/201_user_setting_get'
+        400:
+          description: status code 400
+          schema:
+            $ref: '#/definitions/400_error'
+        500:
+          description: status code 500
+          schema:
+            $ref: '#/definitions/500_error'
+
+            
+    
+            
+    
+
+definitions:
+# Internal Server Error
+  500_error:
+    type: object
+    properties:
+      message:
+        type: string
+        example: Internal Server Error
+
+# Forbidden      
+  400_error:
+    type: object
+    properties:
+      message:
+        type: string
+        example: Forbidden
+
+
+  201_auth_signup:
+    type: object
+    properties:
+      message:
+        type: string
+        example: "Sucessfully signup!" 
+      data:
+        type: object
+        properties:
+          user_id:
+            type: string
+            example : "jambam"
+
+  201_auth_delete:
+    type: object
+    properties:
+      message:
+        type: string
+        example: "Successfully delete account!"
+            
+  201_auth_signin:
+    type: object
+    properties:
+      message:
+        type: string
+        example: "Successfully signin!"
+      data:
+        type: object
+        properties:
+          token:
+            type: string
+            example: "asdas!@#$.asdjhqiuddkwq^%&%#$,!@#"
+            
+  201_board:
+    type: object
+    properties:
+      message:
+        type: string
+        example: "Successfully register"
+      data:
+        type: object
+        properties:
+          board_img:
+            type: string
+            example: "https://weatherook.s3.ap-northeast-2.amazonaws.com/xxx.jpg"
+          board_idx:
+            type: integer
+            example: 43
+          board_auth:
+            type: string
+            example: "PUBLIC"
+          board_stylelist:
+            type: array
+            items:
+              type: string
+            example: "유스, 댄디"
+            
+  201_board_delete:
+    type: object
+    properties:
+      message:
+        type: string
+        example: "Successfully delete board"
+        
+  201_board_get:
+    type: object
+    properties:
+      message:
+        type: string
+        example: "Successfully get board"
+      data:
+        type: object
+        properties:
+          board_idx:
+            type: integer
+            example: 3
+          user_img:
+            type: string
+            example: "https://weatherook.s3.ap-northeast-2.amazonaws.com/xxx.PNG"
+          user_id:
+            type: string
+            example: "awesome33"
+          board_img:
+            type: string
+            example: "https://weatherook.s3.ap-northeast-2.amazonaws.com/xxx.PNG"
+          board_desc:
+            type: string
+            example: "날씨가 좋아져서 다행이다"
+          like_cnt:
+            type: integer
+            example: 1
+          like_flag:
+            type: integer
+            example: 1
+          board_temp_min:
+            type: integer
+            example: 15
+          board_temp_max:
+            type: integer
+            example: 22
+          board_weather:
+            type: integer
+            example: 2
+          board_date:
+            type: string
+            example: "07-07"
+          comment_list:
+            type: array
+            items:
+              type: array
+              items:
+                type: string
+                example: "comment_idx : 24, comment_desc: 좋은 하루 보내세요!, comment_date: 2018-07-08T08:55:48.000Z, comment_id: drifin94"
+          comment_cnt:
+            type: integer
+            example: 3
+          flag:
+            type: integer
+            example: 1
+            
+  201_board_like:
+    type: object
+    properties:
+      message:
+        type: string
+        example: "Successfully update like or Successfully delete like" 
+            
+  201_board_commend_post:
+    type: object
+    properties:
+      message:
+        type: string
+        example: "Successfully get today fashion list" 
+      data:
+        type: object
+        properties:
+          commend_idx:
+            type: integer
+            example: 14
+          commend_img:
+            type: string
+            example: "https://weatherook.s3.ap-northeast-2.amazonaws.com/xxx.PNG"
+          commend_ref:
+            type: string
+            example: "null"
+            
+  201_board_popular_get:
+    type: object
+    properties:
+      message:
+        type: string
+        example: "Successfully get board"
+      data:
+        type: object
+        properties:
+          board_idx:
+            type: integer
+            example: 3
+          user_img:
+            type: string
+            example: "https://weatherook.s3.ap-northeast-2.amazonaws.com/xxx.PNG"
+          user_id:
+            type: string
+            example: "awesome33"
+          board_img:
+            type: string
+            example: "https://weatherook.s3.ap-northeast-2.amazonaws.com/xxx.PNG"
+          board_desc:
+            type: string
+            example: "날씨가 좋아져서 다행이다"
+          like_cnt:
+            type: integer
+            example: 1
+          like_flag:
+            type: integer
+            example: 1
+          board_temp_min:
+            type: integer
+            example: 15
+          board_temp_max:
+            type: integer
+            example: 22
+          board_weather:
+            type: integer
+            example: 2
+          board_date:
+            type: string
+            example: "07-07"
+          comment_list:
+            type: array
+            items:
+              type: array
+              items:
+                type: string
+                example: "comment_idx : 24, comment_desc: 좋은 하루 보내세요!, comment_date: 2018-07-08T08:55:48.000Z, comment_id: drifin94"
+          comment_cnt:
+            type: integer
+            example: 3
+          flag:
+            type: integer
+            example: 1 
+            
+  201_board_latest_get:
+    type: object
+    properties:
+      message:
+        type: string
+        example: "Successfully today latest"
+      data:
+        type: object
+        properties:
+          board_idx:
+            type: integer
+            example: 3
+          user_img:
+            type: string
+            example: "https://weatherook.s3.ap-northeast-2.amazonaws.com/xxx.PNG"
+          user_id:
+            type: string
+            example: "awesome33"
+          board_img:
+            type: string
+            example: "https://weatherook.s3.ap-northeast-2.amazonaws.com/xxx.PNG"
+          board_desc:
+            type: string
+            example: "날씨가 좋아져서 다행이다"
+          like_cnt:
+            type: integer
+            example: 1
+          like_flag:
+            type: integer
+            example: 1
+          board_temp_min:
+            type: integer
+            example: 15
+          board_temp_max:
+            type: integer
+            example: 22
+          board_weather:
+            type: integer
+            example: 2
+          board_date:
+            type: string
+            example: "07-07"
+          comment_list:
+            type: array
+            items:
+              type: array
+              items:
+                type: string
+                example: "comment_idx : 24, comment_desc: 좋은 하루 보내세요!, comment_date: 2018-07-08T08:55:48.000Z, comment_id: drifin94"
+          comment_cnt:
+            type: integer
+            example: 3
+          flag:
+            type: integer
+            example: 1 
+            
+  201_board_today_filter_post:
+    type: object
+    properties:
+      message:
+        type: string
+        example: "Successfully today latest"
+      data:
+        type: object
+        properties:
+          board_idx:
+            type: integer
+            example: 3
+          user_img:
+            type: string
+            example: "https://weatherook.s3.ap-northeast-2.amazonaws.com/xxx.PNG"
+          user_id:
+            type: string
+            example: "awesome33"
+          board_img:
+            type: string
+            example: "https://weatherook.s3.ap-northeast-2.amazonaws.com/xxx.PNG"
+          board_desc:
+            type: string
+            example: "날씨가 좋아져서 다행이다"
+          like_cnt:
+            type: integer
+            example: 1
+          like_flag:
+            type: integer
+            example: 1
+          board_temp_min:
+            type: integer
+            example: 15
+          board_temp_max:
+            type: integer
+            example: 22
+          board_weather:
+            type: integer
+            example: 2
+          board_date:
+            type: string
+            example: "07-07"
+          comment_list:
+            type: array
+            items:
+              type: array
+              items:
+                type: string
+                example: "comment_idx : 24, comment_desc: 좋은 하루 보내세요!, comment_date: 2018-07-08T08:55:48.000Z, comment_id: drifin94"
+          comment_cnt:
+            type: integer
+            example: 3
+          flag:
+            type: integer
+            example: 1 
+            
+  201_board_follow_get:
+    type: object
+    properties:
+      message:
+        type: string
+        example: "Successfully show follow_board_list"
+      data:
+        type: object
+        properties:
+          board_idx:
+            type: integer
+            example: 3
+          user_img:
+            type: string
+            example: "https://weatherook.s3.ap-northeast-2.amazonaws.com/xxx.PNG"
+          user_id:
+            type: string
+            example: "awesome33"
+          board_img:
+            type: string
+            example: "https://weatherook.s3.ap-northeast-2.amazonaws.com/xxx.PNG"
+          board_desc:
+            type: string
+            example: "날씨가 좋아져서 다행이다"
+          like_cnt:
+            type: integer
+            example: 1
+          like_flag:
+            type: integer
+            example: 1
+          board_temp_min:
+            type: integer
+            example: 15
+          board_temp_max:
+            type: integer
+            example: 22
+          board_weather:
+            type: integer
+            example: 2
+          board_date:
+            type: string
+            example: "07-07"
+          comment_list:
+            type: array
+            items:
+              type: array
+              items:
+                type: string
+                example: "comment_idx : 24, comment_desc: 좋은 하루 보내세요!, comment_date: 2018-07-08T08:55:48.000Z, comment_id: drifin94"
+          comment_cnt:
+            type: integer
+            example: 3
+          flag:
+            type: integer
+            example: 1 
+
+  201_board_filter_post:
+    type: object
+    properties:
+      message:
+        type: string
+        example: "Successfully show follow_board_list"
+      data:
+        type: object
+        properties:
+          board_idx:
+            type: integer
+            example: 3
+          user_img:
+            type: string
+            example: "https://weatherook.s3.ap-northeast-2.amazonaws.com/xxx.PNG"
+          user_id:
+            type: string
+            example: "awesome33"
+          board_img:
+            type: string
+            example: "https://weatherook.s3.ap-northeast-2.amazonaws.com/xxx.PNG"
+          board_desc:
+            type: string
+            example: "날씨가 좋아져서 다행이다"
+          like_cnt:
+            type: integer
+            example: 1
+          like_flag:
+            type: integer
+            example: 1
+          board_temp_min:
+            type: integer
+            example: 15
+          board_temp_max:
+            type: integer
+            example: 22
+          board_weather:
+            type: integer
+            example: 2
+          board_date:
+            type: string
+            example: "07-07"
+          comment_list:
+            type: array
+            items:
+              type: array
+              items:
+                type: string
+                example: "comment_idx : 24, comment_desc: 좋은 하루 보내세요!, comment_date: 2018-07-08T08:55:48.000Z, comment_id: drifin94"
+          comment_cnt:
+            type: integer
+            example: 3
+          flag:
+            type: integer
+            example: 1 
+        
+  201_board_comment:
+    type: object
+    properties:
+      message:
+        type: string
+        example: "Successfully register comment" 
+      data:
+        type: object
+        properties:
+          comment_idx:
+            type: integer
+            example: 94
+          board_idx:
+            type: integer
+            example: 6
+          comment_desc:
+            type: string
+            example: "날씨에 어울리는 옷이네요~"
+            
+  201_board_comment_delete:
+    type: object
+    properties:
+      message:
+        type: string
+        example: "Successfully delete comment"
+            
+  201_board_comment_put:
+    type: object
+    properties:
+      message:
+        type: string
+        example: "Successfully update comment" 
+      data:
+        type: object
+        properties:
+          comment_idx:
+            type: integer
+            example: 94
+          comment_desc:
+            type: string
+            example: "사진 잘 나왔어요~!"
+          board_idx:
+            type: integer
+            example: 1
+            
+  201_board_comment_get:
+    type: object
+    properties:
+      message:
+        type: string
+        example: "Successfully get comment list" 
+      data:
+        type: object
+        properties:
+          comment_idx:
+            type: integer
+            example: 94
+          comment_desc:
+            type: string
+            example: "오늘 하루도 힘 !"
+          comment_date:
+            type: string
+            example: "2018-07-08T09:06:22.000Z"
+          comment_id:
+            type: string
+            example: "joon_89"
+          user_img:
+            type: string
+            example: "https://weatherook.s3.ap-northeast-2.amazonaws.com/xxx.PNG"
+            
+  201_weather_post:
+    type: object
+    properties:
+      message:
+        type: string
+        example: "successfully get weather" 
+      data:
+        type: object
+        properties:
+          date_type:
+            type: integer
+            example : 1
+          current_weather:
+            type: string
+            example : "비"
+          current_temp:
+            type: integer
+            example : 20
+          current_pop:
+            description: "강수확률"
+            type: integer
+            example : 80
+          current_reh:
+            description: "습도"
+            type: integer
+            example : 95
+          temp_af:
+            type: integer
+            example : 19
+          temp_am:
+            type: integer
+            example : 23
+          weather_af:
+            type: string
+            example : "비"
+          weather_am:
+            type: string
+            example : "비"
+  201_weather_web_get:
+    type: object
+    properties:
+      message:
+        type: string
+        example: "successfully get weather" 
+      data:
+        type: object
+        properties:
+          user_img:
+            type: string
+            example :  "https://weatherook.s3.ap-northeast-2.amazonaws.com/xxx.PNG"
+          date_type:
+            type: integer
+            example : 2
+          current_weather:
+            type: string
+            example : "비"
+          current_temp:
+            type: integer
+            example : 26
+          current_pop:
+            type: integer
+            example : 60
+          current_reh:
+            type: integer
+            example : 85
+          temp_am:
+            type: integer
+            example : 24
+          temp_af:
+            type: integer
+            example : 29
+          weather_af:
+            type: string
+            example : "구름 많음"
+          weather_am:
+            type: string
+            example : "구름 조금"
+  
+  201_weather_list_post:
+    type: object
+    properties:
+      message:
+        type: string
+        example: "successfully get weather" 
+      data:
+        type: object
+        properties:
+          hour:
+            type: integer
+            example :  24
+          weather:
+            type: integer
+            example : 4
+          temp:
+            type: integer
+            example : 20
+            
+  201_weather_comment_post:
+    type: object
+    properties:
+      message:
+        type: string
+        example: "Successfully get One board" 
+      data:
+        type: object
+        properties:
+          weather_text_temp:
+            type: string
+            example :  "걱정의 대부분은 아직 일어나지 않는 일이래요."
+          weather_text_weather:
+            type: string
+            example : "걱정 마요. 지금 비는 안와요"
+            
+  201_user_news_get:
+    type: object
+    properties:
+      message:
+        type: string
+        example: "success my news" 
+      data:
+        type: object
+        properties:
+          flag:
+            type: integer
+            example :  0
+          comment_str:
+            type: string
+            example : "님이 댓글을 남겼습니다"
+          board_img:
+            type: string
+            example : "https://weatherook.s3.ap-northeast-2.amazonaws.com/xxx.PNG"
+          board_idx:
+            type: integer
+            example : 10
+          comment_idx:
+            type: integer
+            example : 1
+          comment_img:
+            type: string
+            example : "https://s3.ap-northeast-2.amazonaws.com/weatherook/xxx.jpeg"
+          comment_desc:
+            type: string
+            example : "피드느낌 너무 좋아요!"
+          comment_id:
+            type: string
+            example : "minority78"
+          date:
+            type: string
+            example :  "2018-07-09T01:46:28.000Z"
+          date_modify:
+            type: string
+            example :  "07-09 10:07"
+            
+  201_user_follow_post:
+    type: object
+    properties:
+      message:
+        type: string
+        example: "Success follow" 
+        
+        
+  201_user_show:
+    type: object
+    properties:
+      message:
+        type: string
+        example: "Successfully user show"
+      data:
+        type: object
+        properties:
+          user_img:
+            type: string
+            example: "https://s3.ap-northeast-2.amazonaws.com/weatherook/xxx.jpeg"
+          user_id: 
+            type: string
+            example: "awesome33"
+          board_num:
+            type: integer
+            example: 3
+          follower:
+            type: integer
+            example: 7
+          following:
+            type: integer
+            example: 9
+          board_idx:
+            type: integer
+            example: 3
+          other_user_img:
+            type: string
+            example: "https://weatherook.s3.ap-northeast-2.amazonaws.com/xxx.PNG"
+          other_user_id:
+            type: string
+            example: "awesome33"
+          board_img:
+            type: string
+            example: "https://weatherook.s3.ap-northeast-2.amazonaws.com/xxx.PNG"
+          board_desc:
+            type: string
+            example: "날씨가 좋아져서 다행이다"
+          like_cnt:
+            type: integer
+            example: 1
+          like_flag:
+            type: integer
+            example: 1
+          board_temp_min:
+            type: integer
+            example: 15
+          board_temp_max:
+            type: integer
+            example: 22
+          board_weather:
+            type: integer
+            example: 2
+          board_date:
+            type: string
+            example: "07-07"
+          comment_list:
+            type: array
+            items:
+              type: array
+              items:
+                type: string
+                example: "comment_idx : 24, comment_desc: 좋은 하루 보내세요!, comment_date: 2018-07-08T08:55:48.000Z, comment_id: drifin94"
+          comment_cnt:
+            type: integer
+            example: 3
+          flag:
+            type: integer
+            example: 1 
+            
+  201_user_follower_get:
+    type: object
+    properties:
+      message:
+        type: string
+        example: "User follower ID success"
+      data:
+        type: object
+        properties:
+          user_id:
+            type: string
+            example: "awesome33"
+          user_img:
+            type: string
+            example: "https://weatherook.s3.ap-northeast-2.amazonaws.com/xxx.PNG"
+          user_desc:
+            type: string
+            example: "안녕!"
+            
+  201_user_following_get:
+    type: object
+    properties:
+      message:
+        type: string
+        example: "User following ID success"
+      data:
+        type: object
+        properties:
+          user_id:
+            type: string
+            example: "awesome33"
+          user_img:
+            type: string
+            example: "https://weatherook.s3.ap-northeast-2.amazonaws.com/xxx.PNG"
+          user_desc:
+            type: string
+            example: "안녕!"
+            
+  201_user_setting_get:
+    type: object
+    properties:
+      message:
+        type: string
+        example: "user show success"
+      data:
+        type: object
+        properties:
+          user_img:
+            type: string
+            example: "https://weatherook.s3.ap-northeast-2.amazonaws.com/xxx.png"
+          user_id:
+            type: string
+            example: "awesome33"
+          user_gender:
+            type: string
+            example: "남"
+          user_desc:
+            type: string
+            example: "종끄부끄부끄"
+          user_age:
+            type: integer
+            example: 22
+          user_height:
+            type: integer
+            example: 172
+          user_weight:
+            type: integer
+            example: 70
+          user_stylelist:
+            type: array
+            items:
+              type: string
+            example: ["댄디", "유스"]
+          
+  201_user_setting_put:
+    type: object
+    properties:
+      message:
+        type: string
+        example: "Successfully user Updated"
+      data:
+        type: object
+        properties:
+          user_img:
+            type: string
+            example: "https://weatherook.s3.ap-northeast-2.amazonaws.com/xxx.png"
+          user_id:
+            type: string
+            example: "awesome33"
+          user_gender:
+            type: string
+            example: "남"
+          user_desc:
+            type: string
+            example: "종끄부끄부끄"
+          user_age:
+            type: integer
+            example: 22
+          user_height:
+            type: integer
+            example: 172
+          user_weight:
+            type: integer
+            example: 70
+          user_stylelist:
+            type: array
+            items:
+              type: string
+            example: ["댄디", "유스"]
+  
