@@ -6,9 +6,8 @@ const moment = require('moment');
 
 router.get('/', async function(req, res){
     let token = req.headers.token;
-    console.log(token);
     let decoded = jwt.verify(token);
-    /*if (decoded == -1){
+    if (decoded == -1){
         res.status(500).send({
             message : "Token error"
         }); 
@@ -148,7 +147,7 @@ router.get('/', async function(req, res){
                     data : data_result
                 }); 
             }   
-        }*/
+        }
     
 }); 
 module.exports = router;
