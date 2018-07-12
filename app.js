@@ -22,7 +22,7 @@ const swaggerDefinition = {
     version: '1.0.0', // Version (required)
     description: 'weatherook', // Description (optional)
   },
-  host: 'https://weatherook.cf', // Host (optional)
+  host: 'weatherook.cf', // Host (optional)
   basePath: '/', // Base path (optional)
 }
 
