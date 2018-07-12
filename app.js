@@ -18,7 +18,7 @@ var app = express();
 
 const swaggerDefinition = {
   info: { // API informations (required)
-    title: 'Weathrook', // Title (required)
+    title: 'Weatherook', // Title (required)
     version: '1.0.0', // Version (required)
     description: 'weatherook', // Description (optional)
   },
