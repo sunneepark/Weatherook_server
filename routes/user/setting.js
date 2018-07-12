@@ -69,6 +69,7 @@ router.put('/',upload.single('user_img'), async function(req, res){
         let user_weight = req.body.user_weight;
         let user_gender = req.body.user_gender;
         let user_stylelist= req.body.user_stylelist;
+        console.log(user_stylelist);
         if(req.file){
             user_img = req.file.location;
         }
