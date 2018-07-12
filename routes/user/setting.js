@@ -50,7 +50,7 @@ router.get('/', async function(req, res){
 })
 
 //개인 정보 수정
-router.put('/',upload.single('user_img'), async function(req, res){
+router.post('/',upload.single('user_img'), async function(req, res){
     let token = req.headers.token; 
     let decoded = jwt.verify(token);
     let user_img;
