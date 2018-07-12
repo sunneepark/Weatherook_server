@@ -51,7 +51,6 @@ var insert_weather=async function(date, Data, loc_type){ //내일 날씨 저장
 }
 var update_weather= async function(Data, save){ //data가 새로 들어온, save는 기존 data
     current=Data[0];
-    console.log(current);
     var date_type;
 
     var temp_min_a;
