@@ -89,11 +89,9 @@ var update_weather= async function(Data, save){ //data가 새로 들어온, save
     }
     return temp;
 }
-var cronJob_am= cron.job("* */1 * * * *", async function(){ //3시간마다 비교
-
+var cronJob_am= cron.job("0 0 0/1 * * *", async function(){ //3시간마다 비교
     let checkBoardQuery = 'SELECT date FROM weather WHERE date_type=2'; 
     let checkBoardResult = await db.queryParam_None(checkBoardQuery);
-    
     var today=moment().format('YYYY-MM-DD');
     var tomorrow;
     var insert_flag=0;
