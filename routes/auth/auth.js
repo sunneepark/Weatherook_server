@@ -16,7 +16,7 @@ router.post('/', async function(req, res){
     
     let user_bmi=user_weight/(user_height/100*user_height/100);
     let user_stylelist=req.body.user_stylelist;
-
+    console.log(user_stylelist);
     //id 또는 pw 입력 오류 시
     if(!user_id || !user_pw){
         res.status(400).send({
