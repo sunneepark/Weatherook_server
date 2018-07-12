@@ -197,12 +197,17 @@ router.put('/',upload.single('user_img'), async function(req, res){
                 console.log(user_stylelist[i]);
                 let settingStyleQuery= "SELECT style_idx FROM style WHERE style_type= ?";
                 let settingStyleResult = await db.queryParam_Arr(settingStyleQuery,user_stylelist[i]);
+                if(!settingStyleResult){ //쿼리 에러 
+                    res.status(400).send({
+                        message : "don't have that style"
+                    }); 
+                }
                 let styleindex=parseInt(settingStyleResult[0].style_idx,10);
 
                 let updateStyleQuery="INSERT INTO user_style (user_idx, style_idx) VALUES(?,?)";
                 let updateStyleResult = await db.queryParam_Arr(updateStyleQuery,[user_idx, styleindex]);
 
-                if(!settingStyleResult || !updateStyleResult || !deleteUserStyleResult){ //쿼리 에러 
+                if( !updateStyleResult || !deleteUserStyleResult){ //쿼리 에러 
                     res.status(500).send({
                         message : "Internal Server Error, failed to insert style"
                     }); 
