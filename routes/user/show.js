@@ -156,7 +156,7 @@ router.post('/', async function(req, res){
             data_result.push(data_res);
         }
         res.status(201).send({
-            message : "Successfully total board filtering", 
+            message : "Successfully user show", 
             showUserPageResult,
             showBoardNumResult,
             showFollowerNumResult,

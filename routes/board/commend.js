@@ -23,6 +23,7 @@ router.post('/', async function(req, res){
     //지역
     let x=req.body.x;
     let y=req.body.y;
+    let date_type=req.body.date_type;
     let loc_type; 
     if(!x || !y){
         loc_type=0;
@@ -31,8 +32,8 @@ router.post('/', async function(req, res){
         await get.type_get(x,y).then(num=>{loc_type=num});//지역 type
     }
     
-    let checkweatherQuery = "SELECT * FROM weather WHERE date_type= 2 and loc_type= ?"; 
-    let checkweatherResult = await db.queryParam_Arr(checkweatherQuery, [loc_type]);
+    let checkweatherQuery = "SELECT * FROM weather WHERE date_type= ? and loc_type= ?"; 
+    let checkweatherResult = await db.queryParam_Arr(checkweatherQuery, [date_type, loc_type]);
     
     let weather_temp=(parseInt(checkweatherResult[0].temp_min)+parseInt(checkweatherResult[0].temp_max))/2;
     weather_temp=parseInt(weather_temp);
