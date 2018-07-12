@@ -23,16 +23,17 @@ router.post('/', async function(req, res){
     if(date_type==2){ //현재날씨 일때 날씨, 온도, 강수확률, 습도 
         var current;
         current = await sc.current_weather();
-        console.log(current);
         //let weather= await get.http_gets(x,y);
         //console.log(weather[0]);
-        current_weather=current.wfKor[0];
+        current_weather=await get.weather_get(0,current.wfKor[0],0);
+        
         current_temp=parseInt(current.temp);
         current_pop=parseInt(current.pop);
         current_reh=parseInt(current.reh);   
     }
     let loc_type; 
-    await get.type_get(x,y).then(num=>{loc_type=num});//지역 type
+    loc_type=0;
+    //await get.type_get(x,y).then(num=>{loc_type=num});//지역 type
     console.log(loc_type);
     let checkweatherQuery = "SELECT * FROM weather WHERE date_type= ? and loc_type= ?"; 
     let checkweatherResult = await db.queryParam_Arr(checkweatherQuery, [date_type, loc_type]);
@@ -45,14 +46,14 @@ router.post('/', async function(req, res){
     else{
         let data_res = {
             date_type:date_type,
-            current_weather:current_weather,
+            current_weather: current_weather,
             current_temp:current_temp,
             current_pop:current_pop,
             current_reh:current_reh,
             temp_af:checkweatherResult[0].temp_min,
             temp_am:checkweatherResult[0].temp_max,
-            weather_af:await get.weather_get(checkweatherResult[0].weather_af,0,1),
-            weather_am:await get.weather_get(checkweatherResult[0].weather_am,0,1)
+            weather_af:checkweatherResult[0].weather_af,
+            weather_am:checkweatherResult[0].weather_am
         }
         res.status(201).send({
             message:"successfully get weather",

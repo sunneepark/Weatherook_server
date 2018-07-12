@@ -13,7 +13,7 @@ router.post('/', async function(req, res){
         }); 
         return;
     }
-    let weather= await get.http_gets(x,y);
+    let weather= await get.http_gets(x+23,y);
     let weather_arr=[];
     
     for(var i=0;i<6;i++){

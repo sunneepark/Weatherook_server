@@ -23,17 +23,20 @@ router.post('/', async function(req, res){
     //지역
     let x=req.body.x;
     let y=req.body.y;
+    let date_type=req.body.date_type;
     let loc_type; 
     if(!x || !y){
         loc_type=0;
     }
     else{
-        await get.type_get(x,y).then(num=>{loc_type=num});//지역 type
+        loc_type=0;
+        //await get.type_get(x,y).then(num=>{loc_type=num});//지역 type
     }
     
-    let checkweatherQuery = "SELECT * FROM weather WHERE date_type= 2 and loc_type= ?"; 
-    let checkweatherResult = await db.queryParam_Arr(checkweatherQuery, [loc_type]);
+    let checkweatherQuery = "SELECT * FROM weather WHERE date_type= ? and loc_type= ?"; 
+    let checkweatherResult = await db.queryParam_Arr(checkweatherQuery, [date_type, loc_type]);
     
+    console.log(checkweatherResult);
     let weather_temp=(parseInt(checkweatherResult[0].temp_min)+parseInt(checkweatherResult[0].temp_max))/2;
     weather_temp=parseInt(weather_temp);
     console.log(weather_temp);
@@ -41,8 +44,8 @@ router.post('/', async function(req, res){
     let weatherResult;
     
     if(user_idx){ //유저가 있을 때
-        weatherQuery='select commend_idx, commend_img,commend_ref from board_commend where commend_temp+1 = ? or commend_temp = ? and commend_check=0 and commend_style in (select style_idx from user_style where user_idx=?) order by rand() limit 5';
-        weatherResult= await db.queryParam_Arr(weatherQuery, [weather_temp, weather_temp, user_idx]);
+        weatherQuery='select commend_idx, commend_img,commend_ref from board_commend where commend_temp+2 = ? or commend_temp+1 = ? or commend_temp = ? and commend_check=0 and commend_style in (select style_idx from user_style where user_idx=?) order by rand() limit 5';
+        weatherResult= await db.queryParam_Arr(weatherQuery, [weather_temp, weather_temp, weather_temp, user_idx]);
 
     }
     else{

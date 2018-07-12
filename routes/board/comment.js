@@ -219,11 +219,12 @@ router.get('/:board_idx', async function(req, res){
     }
     else {
         //댓글이 있음
-        let getCommentInfo = 'SELECT * FROM comment c, (SELECT user_img FROM user u, board b WHERE u.user_id = b.writer_id) u WHERE comment_idx = ?'; 
+        let getCommentInfo = 'SELECT * FROM comment c, (SELECT user_img FROM user u WHERE u.user_id = (select comment_id from comment where comment_idx=?)) u WHERE comment_idx = ?'; 
         let getCommentInfoRes;
         for (var i=0; i<checkCmtInBoardRes.length; i++){
             comment_idx = checkCmtInBoardRes[i].comment_idx; 
-            getCommentInfoRes = await db.queryParam_Arr(getCommentInfo, [comment_idx]); 
+            getCommentInfoRes = await db.queryParam_Arr(getCommentInfo, [comment_idx, comment_idx]);
+
             if(!getCommentInfoRes){
                 res.status(500).send({
                     message : "Internal Server Error"

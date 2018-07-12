@@ -62,12 +62,12 @@ module.exports={
     },
     type_get :async function(x,y){
         let loc_type;
-        if(x>=61){
-            if(y<=125) loc_type=0;
+        if(x>=35){
+            if(y<=126) loc_type=0;
             else loc_type=3;
         }
         else{
-            if(y<=125) loc_type=1;
+            if(y<=126) loc_type=1;
             else loc_type=2;
         }
         return loc_type;

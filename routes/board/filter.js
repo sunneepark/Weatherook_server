@@ -9,7 +9,18 @@ router.post('/',upload.single('board_img'), async function(req, res){
     let gender=req.body.gender;
     let height=parseInt(req.body.height);
     let size=req.body.size;
-
+    let token = req.headers.token; 
+    let user_user_idx;
+    if(token){
+        let decoded = jwt.verify(token);
+    
+        if (decoded == -1){
+            res.status(500).send({
+                message : "Token error"
+            }); 
+        }
+        user_user_idx = decoded.user_idx;
+    }
     var bmi_range_min;
     var bmi_range_max;
 
@@ -37,7 +48,7 @@ router.post('/',upload.single('board_img'), async function(req, res){
     let weather=req.body.weather;
     let checkBoardQuery = 'SELECT board_idx FROM board WHERE ? between board_temp_min and board_temp_max and board_weather = ? and board_auth=\'public\' and board_idx in (SELECT board_idx from user_board where user_idx in (SELECT user_idx FROM user WHERE user_bmi BETWEEN ? and ? and user_gender = ? and user_height between ? and ?))';
     let checkBoardResult=await db.queryParam_Arr(checkBoardQuery, [temp, weather,bmi_range_min, bmi_range_max,gender, height-2, height+2]);
-    console.log(checkBoardResult);
+    
     let checkstyleQuery='SELECT * FROM board_style WHERE board_idx = ? and style_idx =(select style_idx from style where style_type= ?)';
     let checkstyleResult;
     let real_board_idx=[];
@@ -61,6 +72,7 @@ router.post('/',upload.single('board_img'), async function(req, res){
     let data_res;
     let data_result=[];
     for(var k=0;k<real_board_idx.length;k++){
+        let like_flag=0;
         let board_idx=real_board_idx[k];
         let comment_idx;
         let comment_arr = []; 
@@ -89,7 +101,13 @@ router.post('/',upload.single('board_img'), async function(req, res){
             //comment를 가져오기 위한 board_comment와 comment 테이블 접근
             let checkCommentInBoard = 'SELECT * FROM board_comment WHERE board_idx = ?'; 
             let checkCommentInBoardRes = await db.queryParam_Arr(checkCommentInBoard, [board_idx]); 
-            
+            if(user_user_idx){
+                //like flag를 가져오기 위한 user 테이블 비교
+                let checkLikeInBoard = 'select * from weatherook.like where user_idx = ? and like_idx in (select like_idx from board_like where board_idx=?);'; 
+                let checkLikeInBoardRes = await db.queryParam_Arr(checkLikeInBoard, [user_user_idx, board_idx]); 
+                
+                if(checkLikeInBoardRes.length>0) like_flag=1;
+            }
             if(!checkCommentInBoardRes || !selectOneBoardResult || !selectWriterOneBoardResult || !selectLikesCntResult){
                 res.status(500).send({
                     message : "Internal Server Error"
@@ -144,6 +162,7 @@ router.post('/',upload.single('board_img'), async function(req, res){
                 board_desc : selectOneBoardResult[0].board_desc, 
                 //hashtag_desc : hashtag_desc, 
                 like_cnt : selectLikesCntResult[0].count, 
+                like_flag : like_flag,
                 board_temp_min : selectOneBoardResult[0].board_temp_min, 
                 board_temp_max : selectOneBoardResult[0].board_temp_max,
                 board_weather : selectOneBoardResult[0].board_weather,

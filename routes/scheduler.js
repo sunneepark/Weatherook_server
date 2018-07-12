@@ -6,7 +6,26 @@ const db = require('../module/pool.js');
 const get = require('../module/get.js');
 
 
-var current=0;
+var current={ '$': { seq: '0' },
+hour: [ '18' ],
+day: [ '0' ],
+temp: [ '28.0' ],
+tmx: [ '-999.0' ],
+tmn: [ '-999.0' ],
+sky: [ '2' ],
+pty: [ '0' ],
+wfKor: [ '구름 조금' ],
+wfEn: [ 'Partly Cloudy' ],
+pop: [ '10' ],
+r12: [ '0.0' ],
+s12: [ '0.0' ],
+ws: [ '3.5' ],
+wd: [ '6' ],
+wdKor: [ '서' ],
+wdEn: [ 'W' ],
+reh: [ '75' ],
+r06: [ '0.0' ],
+s06: [ '0.0' ] };
 var insert_weather=async function(date, Data, loc_type){ //내일 날씨 저장
     for(var i=0;i<Data.length;i++){
         if(Data[i].day == 1){
@@ -70,7 +89,7 @@ var update_weather= async function(Data, save){ //data가 새로 들어온, save
     }
     return temp;
 }
-var cronJob_am= cron.job("* */3 * * *", async function(){ //3시간마다 비교
+var cronJob_am= cron.job("* */1 * * * *", async function(){ //3시간마다 비교
 
     let checkBoardQuery = 'SELECT date FROM weather WHERE date_type=2'; 
     let checkBoardResult = await db.queryParam_None(checkBoardQuery);
@@ -95,7 +114,7 @@ var cronJob_am= cron.job("* */3 * * *", async function(){ //3시간마다 비교
     let checkQuery2 = 'SELECT * FROM weather WHERE loc_type=0 AND (date_type=2 OR date_type=3)'; 
     let checkResult2 = await db.queryParam_None(checkQuery2); 
     get.getKoreanWeather("서울특별시","강남구","역삼1동",async function(error,topObj,midObj,leafObj,weather){  
-        await update_weather(weather,checkResult2).then(num=>{current=num});
+        await update_weather(weather,checkResult2);
         if(insert_flag==1) insert_weather(tomorrow,weather,0);
     });
     

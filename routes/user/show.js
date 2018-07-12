@@ -53,7 +53,7 @@ router.post('/', async function(req, res){
         }else{
         for(var k=0;k<real_board_idx.length;k++){
             let board_idx=real_board_idx[k].board_idx;
-
+            let like_flag=0;
             let comment_idx;
             let comment_arr = []; 
             let user_id;
@@ -83,6 +83,12 @@ router.post('/', async function(req, res){
                 let checkCommentInBoard = 'SELECT * FROM board_comment WHERE board_idx = ?'; 
                 let checkCommentInBoardRes = await db.queryParam_Arr(checkCommentInBoard, [board_idx]); 
                 
+                if(user_idx){
+                    //like flag를 가져오기 위한 user 테이블 비교
+                    let checkLikeInBoard = 'select * from weatherook.like where user_idx = ? and like_idx in (select like_idx from board_like where board_idx=?);'; 
+                    let checkLikeInBoardRes = await db.queryParam_Arr(checkLikeInBoard, [user_idx, board_idx]); 
+                    if(checkLikeInBoardRes.length>0) like_flag=1;
+                }
                 if(!checkCommentInBoardRes || !selectOneBoardResult || !selectWriterOneBoardResult || !selectLikesCntResult){
                     res.status(500).send({
                         message : "Internal Server Error"
@@ -136,7 +142,8 @@ router.post('/', async function(req, res){
                     board_img : selectOneBoardResult[0].board_img,
                     board_desc : selectOneBoardResult[0].board_desc, 
                     //hashtag_desc : hashtag_desc, 
-                    like_cnt : selectLikesCntResult[0].count, 
+                    like_cnt : selectLikesCntResult[0].count,
+                    like_flag : like_flag,
                     board_temp_min : selectOneBoardResult[0].board_temp_min, 
                     board_temp_max : selectOneBoardResult[0].board_temp_max,
                     board_weather : selectOneBoardResult[0].board_weather,
@@ -149,7 +156,7 @@ router.post('/', async function(req, res){
             data_result.push(data_res);
         }
         res.status(201).send({
-            message : "Successfully total board filtering", 
+            message : "Successfully user show", 
             showUserPageResult,
             showBoardNumResult,
             showFollowerNumResult,
