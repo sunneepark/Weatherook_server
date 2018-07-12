@@ -216,7 +216,7 @@ router.put('/',upload.single('user_img'), async function(req, res){
             
         }
     }
-        let updateUser='select user_img,user_id,user_desc,user_age,user_height,user_weight from user where user_idx=?';
+        let updateUser='select user_img,user_id,user_gender,user_desc,user_age,user_height,user_weight from user where user_idx=?';
         let updateUserResult=await db.queryParam_Arr(updateUser,[user_idx]);
 
         let updateStyle='select style_type from style where style_idx in(select style_idx from user_style where user_idx=?)';
