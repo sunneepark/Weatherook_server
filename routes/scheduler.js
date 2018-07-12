@@ -143,7 +143,6 @@ module.exports = router;
 
 module.exports={
     current_weather : async function(){
-        console.log(current);
         return current;
     }
 }
