@@ -22,7 +22,7 @@ router.get('/', async function(req, res){
         let user_idx = decoded.user_idx;
         let style = [];
         //개인 정보 보여주기
-        let showUserQuery = 'SELECT user_img, user_id, user_desc, user_age, user_height, user_weight FROM user WHERE user_idx = ?';
+        let showUserQuery = 'SELECT user_img, user_id, user_gender, user_desc, user_age, user_height, user_weight FROM user WHERE user_idx = ?';
         let showUserResult = await db.queryParam_Arr(showUserQuery, [user_idx]);
 
         let showUserStyle = 'SELECT style_type FROM style JOIN user_style USING(style_idx) WHERE user_idx = ?';
