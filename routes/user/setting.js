@@ -54,7 +54,7 @@ router.put('/',upload.single('user_img'), async function(req, res){
     let token = req.headers.token; 
     let decoded = jwt.verify(token);
     let user_img;
-
+    let user_idx;
     //토큰 없을시 오류 
     if (decoded == -1){
         res.status(500).send({
@@ -62,7 +62,7 @@ router.put('/',upload.single('user_img'), async function(req, res){
         }); 
     }
     else {
-        let user_idx = decoded.user_idx;
+        user_idx = decoded.user_idx;
         let user_age = req.body.user_age;
         let user_desc = req.body.user_desc;
         let user_height =  req.body.user_height;
@@ -80,16 +80,16 @@ router.put('/',upload.single('user_img'), async function(req, res){
                 res.status(500).send({
                     message : "Internal Server Error"
                 }); 
-            }else{
+            }/*else{
             res.status(201).send({
                 message : "Successfully user Updated",
                 data : {
                     user_idx : user_idx,
                     user_desc : user_desc
                 }
-            });
+            });*/
         }
-        }
+        //}
 
         if(user_gender){
             let updateGender = 'UPDATE user SET user_gender = ? WHERE user_idx =?';
@@ -99,16 +99,16 @@ router.put('/',upload.single('user_img'), async function(req, res){
                 res.status(500).send({
                     message : "Internal Server Error"
                 }); 
-            }else{
+            }/*else{
             res.status(201).send({
                 message : "Successfully user Updated",
                 data : {
                     user_idx : user_idx,
                     user_gender : user_gender
                 }
-            });
+            });*/
         }
-        }
+        //}
         
         
 
@@ -121,16 +121,16 @@ router.put('/',upload.single('user_img'), async function(req, res){
                 res.status(500).send({
                     message : "Internal Server Error"
                 }); 
-            }else{
+            }/*else{
             res.status(201).send({
                 message : "Successfully user Updated",
                 data : {
                     user_idx : user_idx,
                     user_age : user_age
                 }
-            });
+            });*/
         }
-        }
+        //}
 
         if(user_img){
             let updateImg = 'UPDATE user SET user_img = ? WHERE user_idx =?';
@@ -140,16 +140,16 @@ router.put('/',upload.single('user_img'), async function(req, res){
                 res.status(500).send({
                     message : "Internal Server Error"
                 }); 
-            }else{
+            }/*else{
             res.status(201).send({
                 message : "Successfully user Updated",
                 data : {
                     user_idx : user_idx,
                     user_img : user_img
                 }
-            });
+            });*/
         }
-        }
+        //}
 
         if(user_height){
             let updateHeight = 'UPDATE user SET user_height = ? WHERE user_idx =?';
@@ -159,16 +159,16 @@ router.put('/',upload.single('user_img'), async function(req, res){
                 res.status(500).send({
                     message : "Internal Server Error"
                 }); 
-            }else{
+            }/*else{
             res.status(201).send({
                 message : "Successfully user Updated",
                 data : {
                     user_idx : user_idx,
                     user_height : user_height
                 }
-            });
+            });*/
         }
-        }
+        //}
 
         if(user_weight){
             let updateWeight = 'UPDATE user SET user_weight = ? WHERE user_idx =?';
@@ -178,17 +178,17 @@ router.put('/',upload.single('user_img'), async function(req, res){
                 res.status(500).send({
                     message : "Internal Server Error"
                 }); 
-            }else{
+            }/*else{
             res.status(201).send({
                 message : "Successfully user Updated",
                 data : {
                     user_idx : user_idx,
                     user_weight : user_weight
                 }
-            });
+            });*/
         }
-    }
-            if(user_stylelist){
+    
+        if(user_stylelist){
             let deleteUserStyle = 'DELETE FROM user_style WHERE user_idx = ?'
             let deleteUserStyleResult = await db.queryParam_Arr(deleteUserStyle, [user_idx]);
 
@@ -210,7 +210,7 @@ router.put('/',upload.single('user_img'), async function(req, res){
                 res.status(500).send({
                     message : "Internal Server Error"
                 }); 
-            }else{
+            }/*else{
             res.status(201).send({
                 message : "Successfully user Updated",
                 data : {
@@ -218,9 +218,34 @@ router.put('/',upload.single('user_img'), async function(req, res){
                     user_stylelist : user_stylelist
                 }
             });
-        }
+            }*/
+            
         }
     }
+        let updateUser='select user_img,user_id,user_desc,user_age,user_height,user_weight from user where user_idx=?';
+        let updateUserResult=await db.queryParam_Arr(updateUser,[user_idx]);
+
+        let updateStyle='select style_type from style where style_idx in(select style_idx from user_style where user_idx=?)';
+        let updateResult=await db.queryParam_Arr(updateStyle,[user_idx]);
+        let style__list=[];
+        for(var i=0;i<updateResult.length;i++){
+            style__list.push(updateResult[i].style_type);
+        }
+        if(!updateUserResult){
+            res.status(500).send({
+                message : "Internal Server Error"
+            }); 
+        }else{
+            
+            res.status(201).send({
+                message : "Successfully user Updated",
+                data : {
+                    user_idx : user_idx,
+                    showUserResult : updateUserResult[0],
+                    style : style__list
+                }
+            });
+        }
 });
 
 
