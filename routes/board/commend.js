@@ -29,8 +29,7 @@ router.post('/', async function(req, res){
         loc_type=0;
     }
     else{
-        loc_type=0;
-        //await get.type_get(x,y).then(num=>{loc_type=num});//지역 type
+        await get.type_get(x,y).then(num=>{loc_type=num});//지역 type
     }
     
     let checkweatherQuery = "SELECT * FROM weather WHERE date_type= ? and loc_type= ?"; 
