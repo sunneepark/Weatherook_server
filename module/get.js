@@ -3,7 +3,7 @@ var async = require('async');
 var querystring = require('querystring');
 var xml2js = require('xml2js');
 let request=require('async-request');
-const math=require('math');
+const Math=require('math');
 
 var http_get = function(url, data, callback) {
  
