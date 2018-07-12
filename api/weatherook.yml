@@ -4,7 +4,7 @@ info:
   version: "1.0"
   description: "project weatherook's server API"
 
-host: localhost:3004
+host: https://weatherook.cf
 basePath: /api/v1.0
 schemes:
   - http
