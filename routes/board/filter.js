@@ -9,6 +9,10 @@ router.post('/',upload.single('board_img'), async function(req, res){
     let gender=req.body.gender;
     let height=parseInt(req.body.height);
     let size=req.body.size;
+    if(!gender) gender="여";
+    if(!height) height=160;
+    if(!size) size="보통";
+
     let token = req.headers.token; 
     let user_user_idx;
     if(token){
@@ -44,8 +48,11 @@ router.post('/',upload.single('board_img'), async function(req, res){
     //let checkUserResult = await db.queryParam_Arr(checkUserQuery, [bmi_range_min, bmi_range_max,height-2, height+2]); 
     
     let style=req.body.stylelist;
+ 
     let temp=parseInt(req.body.temp);
     let weather=req.body.weather;
+    if(!temp) temp=26;
+    if(!weather) weather=0;
     let checkBoardQuery = 'SELECT board_idx FROM board WHERE ? between board_temp_min and board_temp_max and board_weather = ? and board_auth=\'public\' and board_idx in (SELECT board_idx from user_board where user_idx in (SELECT user_idx FROM user WHERE user_bmi BETWEEN ? and ? and user_gender = ? and user_height between ? and ?))';
     let checkBoardResult=await db.queryParam_Arr(checkBoardQuery, [temp, weather,bmi_range_min, bmi_range_max,gender, height-2, height+2]);
     
@@ -55,19 +62,28 @@ router.post('/',upload.single('board_img'), async function(req, res){
 
     //console.log(checkBoardResult);
     //스타일과 보드를 비교함.
-    console.log(checkBoardResult.length+"dfs"+ style.length);
-    for(var j=0;j<checkBoardResult.length;j++){
-        let check=0;
-        for(var i=0;i<style.length;i++){
-            checkstyleResult = await db.queryParam_Arr(checkstyleQuery, [checkBoardResult[j].board_idx, style[i]]);
-            
-            if(checkstyleResult.length != 0) check=1;
-            if(check==1){
-                real_board_idx.push(checkBoardResult[j].board_idx);
-                break;
+    if(style){
+        for(var j=0;j<checkBoardResult.length;j++){
+            let check=0;
+            for(var i=0;i<style.length;i++){
+                checkstyleResult = await db.queryParam_Arr(checkstyleQuery, [checkBoardResult[j].board_idx, style[i]]);
+                
+                if(checkstyleResult.length != 0) check=1;
+                if(check==1){
+                    real_board_idx.push(checkBoardResult[j].board_idx);
+                    break;
+                }
             }
         }
     }
+    else{
+        for(var j=0;j<checkBoardResult.length;j++){
+        
+               real_board_idx.push(checkBoardResult[j].board_idx);
+
+        }
+    }
+   
     console.log(real_board_idx);
     let data_res;
     let data_result=[];
