@@ -73,6 +73,7 @@ router.get('/', async function(req, res, next) {
                             flag:1,
                             follow_str:"님이 회원님을 팔로우 했습니다.",
                             follow:followResult[0].user_id,
+                            
                             follow_img : followResult[0].user_img,
                             date:moment(newsResult[i].follow_date).format('YYYY-MM-DD HH:MM'),
                             date_modify:moment(newsResult[i].follow_date).format('MM-DD HH:MM')

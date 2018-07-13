@@ -35,7 +35,7 @@ paths:
             properties:
               user_id:
                 type: string
-                example : jambamc
+                example : jambamc123
               user_pw:
                 type: string
                 example : 123qwe  
@@ -55,7 +55,7 @@ paths:
                 type: array
                 items:
                   type: string
-                example: ["댄디", "유스"]
+                example: "댄디"
       responses:
         201:
           description: status code 201
@@ -173,8 +173,6 @@ paths:
             required: 
               - board_img
               - board_desc
-              - x
-              - y
               - board_auth
               - board_stylelist
               - board_weather
@@ -187,12 +185,6 @@ paths:
               board_desc:
                 type: string
                 example: 오늘 날씨 완전 좋아 ㅎㅎ
-              x:
-                type: number
-                example: 37.579871128849334
-              y:
-                type: number
-                example: 126.98935225645432
               board_auth:
                 type: string
                 example: PUBLIC
