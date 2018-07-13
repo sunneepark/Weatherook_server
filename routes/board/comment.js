@@ -254,7 +254,7 @@ router.get('/:board_idx', async function(req, res){
                 comment_arry={
                     comment_idx : getCommentInfoRes[0].comment_idx,
                     comment_desc : getCommentInfoRes[0].comment_desc,
-                    comment_date : moment(getCommentInfoRes[0].board_date).format('MM DD HH mm ss'),
+                    comment_date : moment(getCommentInfoRes[0].comment_date).format('MM DD HH mm ss'),
                     comment_id : getCommentInfoRes[0].comment_id,
                     user_img : getCommentInfoRes[0].user_img
                 }

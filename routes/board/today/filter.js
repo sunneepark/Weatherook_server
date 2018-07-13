@@ -81,7 +81,6 @@ router.post('/', async function(req, res){
             let check=0;
             for(var i=0;i<style.length;i++){
                 checkstyleResult = await db.queryParam_Arr(checkstyleQuery, [checkBoardResult[j].board_idx, style[i]]);
-                console.log(checkstyleResult[0]);
                 console.log(style[i]);
                 if(checkstyleResult.length != 0) check=1;
                 if(check==1){

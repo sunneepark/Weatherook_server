@@ -22,6 +22,7 @@ router.get('/', async function(req, res, next) {
         }
         else{
             let user_idx = decoded.user_idx;
+            console.log(user_idx);
             let news_arr=[];
 
             let newsQuery = 'select board_idx from user_board where user_idx=?';
@@ -33,13 +34,13 @@ router.get('/', async function(req, res, next) {
 
                 let boardQuery='select board_img from board where board_idx=?';
                 let boardResult = await db.queryParam_Arr(boardQuery, [newsResult[i].board_idx]);
-
+                console.log(commentResult);
+                console.log(commentResult.length);
                 if(commentResult){
-                
                     for(var j=0;j<commentResult.length;j++){
-                        
-                        let commentwriteQuery ='select user_img from user where user_id = ?';
+                        let commentwriteQuery ='select user_img,user_id from user where user_id = ?';
                         let commentwriteResult=await db.queryParam_Arr(commentwriteQuery, [commentResult[j].comment_id]);
+                        console.log(commentwriteResult[0]);
                         var comment={
                             flag : 0,
                             comment_str : "님이 댓글을 남겼습니다",
@@ -87,7 +88,7 @@ router.get('/', async function(req, res, next) {
             }
             for(var i=0;i<news_arr.length;i++){
                 for(var j=1;j<news_arr.length-1;j++){
-                    if(moment(news_arr[j].date,"MM-DD").diff(moment(news_arr[j+1].date,"MM-DD"))<0){
+                    if(moment(news_arr[j].date,"YYYY-MM-DD HH:mm").diff(moment(news_arr[j+1].date,"YYYY-MM-DD HH:mm"))<0){
                         var temp=news_arr[j];
                         news_arr[j]=news_arr[j+1];
                         news_arr[j+1]=temp;
