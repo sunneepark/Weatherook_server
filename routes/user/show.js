@@ -40,8 +40,8 @@ router.post('/', async function(req, res){
         let showFollowingNum = 'SELECT COUNT(follower_idx) AS following FROM follow WHERE user_idx=?';
         let showFollowingNumResult = await db.queryParam_Arr(showFollowingNum, [user_idx]);
 
-        let board_idx = 'SELECT board_idx FROM user_board WHERE user_idx = ? order by board_date desc';
-        
+        let board_idx = 'select board_idx from board where board_idx in(SELECT board_idx FROM user_board WHERE user_idx = ?) order by board_date desc';
+
         let real_board_idx = await db.queryParam_Arr(board_idx, [user_idx]);
 
         //let showBoardAll = 'SELECT board_img, board_desc, board_date, board_weather, board_temp_min, board_temp_max FROM board JOIN user_board  USING (board_idx) WHERE user_board.user_idx =?';
