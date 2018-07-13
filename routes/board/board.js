@@ -19,8 +19,8 @@ router.post('/',upload.single('board_img'), async function(req, res){
     let board_date=req.body.board_date; //글 등록시간
     //let board_hashtag = JSON.parse(req.body.board_hashtag);
     
-  
-    console.log(req.file);
+    console.log(req.body.board_stylelist);
+    console.log(req.file+"sd"+board_desc+"sdf"+board_auth+"Sdf"+style_type);
     // board_img 가 없을 때
     if(!req.file || !board_desc  || !board_auth || !style_type || !token ){
         res.status(400).send({
