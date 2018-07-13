@@ -47,7 +47,6 @@ router.get('/', async function(req, res){
     let current_reh; 
     if(date_type==2){ //현재날씨 일때 날씨, 온도, 강수확률, 습도
         let weather= await get.http_gets(x,y);
-        console.log(weather[0]);
         current_weather=weather[0].wfKor[0];
         current_temp=parseInt(weather[0].temp);
         current_pop=parseInt(weather[0].pop);
