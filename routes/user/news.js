@@ -34,13 +34,12 @@ router.get('/', async function(req, res, next) {
 
                 let boardQuery='select board_img from board where board_idx=?';
                 let boardResult = await db.queryParam_Arr(boardQuery, [newsResult[i].board_idx]);
-                console.log(commentResult);
-                console.log(commentResult.length);
+                
                 if(commentResult){
                     for(var j=0;j<commentResult.length;j++){
                         let commentwriteQuery ='select user_img,user_id from user where user_id = ?';
                         let commentwriteResult=await db.queryParam_Arr(commentwriteQuery, [commentResult[j].comment_id]);
-                        console.log(commentwriteResult[0]);
+                    
                         var comment={
                             flag : 0,
                             comment_str : "님이 댓글을 남겼습니다",
