@@ -70,7 +70,7 @@ router.post('/',upload.single('board_img'), async function(req, res){
                 }
                 else{
                 //style 테이블에 게시글 스타일 정보 삽입
-                for(var i=0;i<style_type.length;i++){ //유저와 스타일 등록
+                /*for(var i=0;i<style_type.length;i++){ //유저와 스타일 등록
                     let signupStyleQuery="SELECT style_idx FROM style WHERE style_type= ?";
                     
                     let signupStyleResult = await db.queryParam_Arr(signupStyleQuery,style_type[i]);
@@ -83,7 +83,7 @@ router.post('/',upload.single('board_img'), async function(req, res){
                             message : "Internal Server Error, failed to insert style"
                         }); 
                     }  
-                }
+                }*/
 
                 /*//hashtag 테이블에 게시글 해시태그 정보 삽입
                 for(var i=0;i<board_hashtag.length;i++){ //게시글과 해시태그 등록
