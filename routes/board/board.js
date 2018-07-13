@@ -18,7 +18,7 @@ router.post('/',upload.single('board_img'), async function(req, res){
     let style_type = req.body.board_stylelist;
     let board_date=req.body.board_date; //글 등록시간
     //let board_hashtag = JSON.parse(req.body.board_hashtag);
-    board_img = req.file.location; 
+    
   
 
     // board_img 가 없을 때 
@@ -27,7 +27,8 @@ router.post('/',upload.single('board_img'), async function(req, res){
             message : "Null Value"
         }); 
     }else {
-        
+        board_img = req.file.location;
+        console.log(board_img);
         //토큰을 decoding
        let decoded = jwt.verify(token);
         //decoding 실패시

@@ -204,6 +204,7 @@ router.get('/:board_idx', async function(req, res){
         res.status(500).send({
             message : "Token Error"
         });
+        return;
     }
     //정상 수행 시
     else{
@@ -239,6 +240,7 @@ router.get('/:board_idx', async function(req, res){
         //댓글이 있음
         let getCommentInfo = 'SELECT * FROM comment c, (SELECT user_img FROM user u WHERE u.user_id = (select comment_id from comment where comment_idx=?)) u WHERE comment_idx = ?'; 
         let getCommentInfoRes;
+        let comment_arry;
         for (var i=0; i<checkCmtInBoardRes.length; i++){
             comment_idx = checkCmtInBoardRes[i].comment_idx; 
             getCommentInfoRes = await db.queryParam_Arr(getCommentInfo, [comment_idx, comment_idx]);
@@ -249,7 +251,14 @@ router.get('/:board_idx', async function(req, res){
                 });
             }
             else {
-                comment_arr = comment_arr.concat(getCommentInfoRes[0]); 
+                comment_arry={
+                    comment_idx : getCommentInfoRes[0].comment_idx,
+                    comment_desc : getCommentInfoRes[0].comment_desc,
+                    comment_date : moment(getCommentInfoRes[0].board_date).format('MM DD HH mm ss'),
+                    comment_id : getCommentInfoRes[0].comment_id,
+                    user_img : getCommentInfoRes[0].user_img
+                }
+                comment_arr = comment_arr.concat(comment_arry); 
             }
         }
     }
