@@ -194,7 +194,25 @@ router.delete('/', async function(req, res){
 }); 
 
 router.get('/:board_idx', async function(req, res){
+    let token = req.headers.token;
     let board_idx = req.params.board_idx; 
+    //토큰을 decoding
+    let decoded = jwt.verify(token);
+    let user_img;
+    //decoding 실패시
+    if(decoded == -1){
+        res.status(500).send({
+            message : "Token Error"
+        });
+    }
+    //정상 수행 시
+    else{
+       let user_idx = decoded.user_idx;
+       
+       let img_query='select user_img from user where user_idx=?';
+       let img_result=await db.queryParam_Arr(img_query,[user_idx]);
+       user_img=img_result[0].user_img;
+    }
 
     if(!board_idx){
         res.status(400).send({
@@ -235,10 +253,10 @@ router.get('/:board_idx', async function(req, res){
             }
         }
     }
-
     res.status(200).send({
         message : "Successfully get comment list",
-        data : comment_arr
+        data : comment_arr,
+               user_img
     });
 })
 
