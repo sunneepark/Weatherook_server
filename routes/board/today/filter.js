@@ -74,13 +74,14 @@ router.post('/', async function(req, res){
 
     //console.log(checkBoardResult);
     //스타일과 보드를 비교함.
+    console.log(checkBoardResult.length);
     if(style){
         for(var j=0;j<checkBoardResult.length;j++){
            
             let check=0;
             for(var i=0;i<style.length;i++){
                 checkstyleResult = await db.queryParam_Arr(checkstyleQuery, [checkBoardResult[j].board_idx, style[i]]);
-                console.log("i"+style[i]);
+                console.log(style[i]);
                 if(checkstyleResult.length != 0) check=1;
                 if(check==1){
                     real_board_idx.push(checkBoardResult[j].board_idx);
