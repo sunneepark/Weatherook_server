@@ -92,8 +92,8 @@ router.post('/', async function(req, res){
             real_board_idx.push(checkBoardResult[j].board_idx);
         }
     }
-    
     console.log(real_board_idx);
+    console.log(real_board_idx.length);
     //필터링 결과로 게시글 출력
     let board_list = []; 
     for(var i = 0; i<real_board_idx.length; i++){
