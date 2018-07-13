@@ -44,6 +44,7 @@ router.post('/', async function(req, res){
             else{
                 res.status(201).send({
                     message : "success unfollow",
+                    flag : "1"
                 });
             }
         }
@@ -60,6 +61,7 @@ router.post('/', async function(req, res){
                 else{
                     res.status(201).send({
                         message : "success follow",
+                        flag : "0"
                     });
                 }
         }
