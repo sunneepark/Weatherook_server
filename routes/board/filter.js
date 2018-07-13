@@ -62,7 +62,7 @@ router.post('/',upload.single('board_img'), async function(req, res){
 
     //console.log(checkBoardResult);
     //스타일과 보드를 비교함.
-    if(style){
+    if(style.length >0 ){
         for(var j=0;j<checkBoardResult.length;j++){
             let check=0;
             for(var i=0;i<style.length;i++){
