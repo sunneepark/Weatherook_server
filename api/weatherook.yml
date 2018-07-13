@@ -4,7 +4,7 @@ info:
   version: "1.0"
   description: "project weatherook's server API"
 
-host: weatherook.cf
+host: localhost:3004
 basePath: /api/v1.0
 schemes:
   - http
@@ -588,7 +588,7 @@ paths:
 
   /board/comment:
     post:
-      summary: 게시글 댓글
+      summary: 게시글 댓글 등록
       description: 게시글 댓글 등록할때
       consumes:
         - application/json
@@ -744,8 +744,13 @@ paths:
       parameters:
         - in: path
           name : board_idx
-          required: true
           type: integer
+        - in: header
+          name: token
+          schema:
+            type: object
+            required: 
+              - user_token
         - in: body
           name: data
           schema:
@@ -1748,6 +1753,9 @@ definitions:
           comment_id:
             type: string
             example: "joon_89"
+          other_user_img:
+            type: string
+            example: "https://weatherook.s3.ap-northeast-2.amazonaws.com/xxx.PNG"
           user_img:
             type: string
             example: "https://weatherook.s3.ap-northeast-2.amazonaws.com/xxx.PNG"
