@@ -6,6 +6,7 @@ const jwt = require('../../../module/jwt.js');
 const moment = require('moment');
 
 router.post('/', async function(req, res){
+    console.log("Sdf");
     let token = req.headers.token; 
     let user_user_idx;
     if(token){
