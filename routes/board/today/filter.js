@@ -86,7 +86,6 @@ router.post('/', async function(req, res){
     //필터링 결과로 게시글 출력
     let board_list = []; 
     for(var i = 0; i<real_board_idx.length; i++){
-        console.log("i"+i);
         let board_idx = real_board_idx[i]; 
         let comment_idx;
         let comment_arr = [];
