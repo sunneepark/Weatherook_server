@@ -71,6 +71,7 @@ router.put('/',upload.single('user_img'), async function(req, res){
         let user_stylelist= req.body.user_stylelist;
         console.log(user_stylelist);
         if(req.file){
+            console.log("file in");
             user_img = req.file.location;
         }
         if(user_desc){
@@ -134,6 +135,7 @@ router.put('/',upload.single('user_img'), async function(req, res){
         //}
 
         if(user_img){
+            console.log(user_img);
             let updateImg = 'UPDATE user SET user_img = ? WHERE user_idx =?';
             let updateImgRes = await db.queryParam_Arr(updateImg, [user_img, user_idx]);
 
