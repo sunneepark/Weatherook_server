@@ -93,7 +93,7 @@ router.post('/', async function(req, res){
         }
     }
     
-    console.log(real_board_idx.length);
+    console.log(real_board_idx);
     //필터링 결과로 게시글 출력
     let board_list = []; 
     for(var i = 0; i<real_board_idx.length; i++){
