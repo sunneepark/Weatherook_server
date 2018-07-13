@@ -43,7 +43,7 @@ router.post('/',upload.single('board_img'), async function(req, res){
     //let checkUserQuery = 'SELECT * from user_board where user_idx in (SELECT user_idx FROM user WHERE user_bmi BETWEEN ? and ? and user_gender = ? and user_height between ? and ?)';
     //let checkUserResult = await db.queryParam_Arr(checkUserQuery, [bmi_range_min, bmi_range_max,height-2, height+2]); 
     
-    let style=req.body.stylelist;
+    let style=JSON.parse(req.body.stylelist);
     let temp=parseInt(req.body.temp);
     let weather=req.body.weather;
     let checkBoardQuery = 'SELECT board_idx FROM board WHERE ? between board_temp_min and board_temp_max and board_weather = ? and board_auth=\'public\' and board_idx in (SELECT board_idx from user_board where user_idx in (SELECT user_idx FROM user WHERE user_bmi BETWEEN ? and ? and user_gender = ? and user_height between ? and ?))';
@@ -55,7 +55,7 @@ router.post('/',upload.single('board_img'), async function(req, res){
 
     //console.log(checkBoardResult);
     //스타일과 보드를 비교함.
-    console.log(checkBoardResult.length, style.length);
+    console.log(checkBoardResult.length+"dfs"+ style.length);
     for(var j=0;j<checkBoardResult.length;j++){
         let check=0;
         for(var i=0;i<style.length;i++){

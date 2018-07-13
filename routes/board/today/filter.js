@@ -82,10 +82,11 @@ router.post('/', async function(req, res){
             }
         }
     }
-    console.log(real_board_idx);
+    console.log(real_board_idx.length);
     //필터링 결과로 게시글 출력
     let board_list = []; 
     for(var i = 0; i<real_board_idx.length; i++){
+        console.log("i"+i);
         let board_idx = real_board_idx[i]; 
         let comment_idx;
         let comment_arr = [];
@@ -137,9 +138,9 @@ router.post('/', async function(req, res){
                     });
                     return
                 }
-                console.log("getUserImgInFilterRes : ", getUserImgInFilterRes)
+                //console.log("getUserImgInFilterRes : ", getUserImgInFilterRes)
                 user_id = getUserImgInFilterRes[0].user_id;
-                console.log("user_id : ", user_id);
+               // console.log("user_id : ", user_id);
                 user_img = getUserImgInFilterRes[0].user_img; 
                 
                 //let getCommentInfo = 'SELECT * FROM comment c, (SELECT user_img FROM user u, board b WHERE u.user_id = b.writer_id) u WHERE comment_idx = ?'; 
@@ -157,8 +158,8 @@ router.post('/', async function(req, res){
                     len_cmt = checkCommentInBoardRes.length //board에서 뿌려줄 comment 수는 원래 코멘트 수와 같다. 
                 }
                 
-                for (var i=0; i<len_cmt; i++){
-                    comment_idx = checkCommentInBoardRes[i].comment_idx; 
+                for (var l=0; l<len_cmt; l++){
+                    comment_idx = checkCommentInBoardRes[l].comment_idx; 
                     getCommentInfoRes = await db.queryParam_Arr(getCommentInfo, [comment_idx]); 
                     if(!getCommentInfoRes){
                         res.status(500).send({
