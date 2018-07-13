@@ -23,7 +23,6 @@ router.post('/', async function(req, res){
     if(date_type==2){ //현재날씨 일때 날씨, 온도, 강수확률, 습도 
         var current;
         current = await sc.current_weather();
-        console.log(current);
         current_weather=await get.weather_get(0,current.wfKor[0],0);
         
         current_temp=parseInt(current.temp);
