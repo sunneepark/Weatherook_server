@@ -20,8 +20,8 @@ router.post('/',upload.single('board_img'), async function(req, res){
     //let board_hashtag = JSON.parse(req.body.board_hashtag);
     
   
-
-    // board_img 가 없을 때 
+    console.log(req.file);
+    // board_img 가 없을 때
     if(!req.file || !board_desc  || !board_auth || !style_type || !token ){
         res.status(400).send({
             message : "Null Value"
