@@ -199,12 +199,14 @@ router.get('/:board_idx', async function(req, res){
     //토큰을 decoding
     let decoded = jwt.verify(token);
     let user_img;
-    //decoding 실패시
-    if(decoded == -1){
-        res.status(500).send({
-            message : "Token Error"
-        });
-        return;
+    if(token){
+        //decoding 실패시
+        if(decoded == -1){
+            res.status(500).send({
+                message : "Token Error"
+            });
+            return;
+        }
     }
     //정상 수행 시
     else{
