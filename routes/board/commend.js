@@ -35,7 +35,6 @@ router.post('/', async function(req, res){
     let checkweatherQuery = "SELECT * FROM weather WHERE date_type= ? and loc_type= ?"; 
     let checkweatherResult = await db.queryParam_Arr(checkweatherQuery, [date_type, loc_type]);
     
-    console.log(checkweatherResult);
     let weather_temp=(parseInt(checkweatherResult[0].temp_min)+parseInt(checkweatherResult[0].temp_max))/2;
     weather_temp=parseInt(weather_temp);
     console.log(weather_temp);
