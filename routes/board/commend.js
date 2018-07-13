@@ -44,15 +44,15 @@ router.post('/', async function(req, res){
     
     if(user_idx){ //유저가 있을 때
         weatherQuery='select commend_idx, commend_img,commend_ref,commend_gender from board_commend where commend_temp between ? and ? and commend_check=0 and commend_gender =(select user_gender from user where user_idx= ?) and commend_style in (select style_idx from user_style where user_idx=?) order by rand() limit 5';
-        weatherResult= await db.queryParam_Arr(weatherQuery, [weather_temp-2, weather_temp+4, ,user_idx, user_idx]);
-
+        weatherResult= await db.queryParam_Arr(weatherQuery, [weather_temp-1, weather_temp+3, user_idx, user_idx]);
+        console.log(weatherResult);
     }
     else{
         console.log("no user");
         weatherQuery='SELECT commend_idx, commend_img,commend_ref FROM board_commend WHERE commend_temp between ? and ? and commend_check=0 order by rand() limit 5';
-        weatherResult= await db.queryParam_Arr(weatherQuery, [weather_temp-2, weather_temp+4]);
+        weatherResult= await db.queryParam_Arr(weatherQuery, [weather_temp-1, weather_temp+3]);
     }
-        console.log(weatherResult);
+        
         let weatherupdateQuery='UPDATE board_commend SET commend_check=0';
         let weatherupdateResult = await db.queryParam_None(weatherupdateQuery);
 
