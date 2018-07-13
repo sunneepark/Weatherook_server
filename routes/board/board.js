@@ -22,7 +22,7 @@ router.post('/',upload.single('board_img'), async function(req, res){
     console.log(req.body.board_stylelist);
     console.log(req.file+"sd"+board_desc+"sdf"+board_auth+"Sdf"+style_type);
     // board_img 가 없을 때
-    if(!req.file || !board_desc  || !board_auth || !style_type || !token ){
+    if(!req.file || !board_desc  || !board_auth  || !token ){
         res.status(400).send({
             message : "Null Value"
         }); 
