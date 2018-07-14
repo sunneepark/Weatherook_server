@@ -78,6 +78,16 @@ paths:
       tags:
         - auth
       parameters:
+        - in: header
+          name : token
+          schema:   
+            type: object
+            required:
+              - user_token
+            properties:
+              token:
+                type: string
+                example : "asdas!@#$.asdjhqiuddkwq^%&%#$,!@#"
         - in: body
           name : data
           schema:   
@@ -399,6 +409,17 @@ paths:
         - application/json
       tags:
       - board_today
+      parameters:
+        - in: header
+          name : token
+          schema:   
+            type: object
+            required:
+              - user_token
+            properties:
+              token:
+                type: string
+                example : "asdas!@#$.asdjhqiuddkwq^%&%#$,!@#"
       responses:
         201:
           description: status code 201
@@ -421,6 +442,17 @@ paths:
         - application/json
       tags:
       - board_today
+      parameters:
+        - in: header
+          name : token
+          schema:   
+            type: object
+            required:
+              - user_token
+            properties:
+              token:
+                type: string
+                example : "asdas!@#$.asdjhqiuddkwq^%&%#$,!@#"
 
       responses:
         201:
@@ -444,7 +476,17 @@ paths:
         - application/json
       tags:
       - board_today
-      parameters: 
+      parameters:
+        - in: header
+          name : token
+          schema:   
+            type: object
+            required:
+              - user_token
+            properties:
+              token:
+                type: string
+                example : "asdas!@#$.asdjhqiuddkwq^%&%#$,!@#"
         - in: body
           name: data
           schema:
@@ -526,7 +568,17 @@ paths:
         - application/json
       tags:
       - board
-      parameters: 
+      parameters:
+        - in: header
+          name : token
+          schema:   
+            type: object
+            required:
+              - user_token
+            properties:
+              token:
+                type: string
+                example : "asdas!@#$.asdjhqiuddkwq^%&%#$,!@#" 
         - in: body
           name: data
           schema:
