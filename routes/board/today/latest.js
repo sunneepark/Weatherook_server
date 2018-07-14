@@ -7,7 +7,7 @@ const jwt = require('../../../module/jwt.js');
 
 router.get('/', async function(req, res){
     let board_date = moment().format('MM-DD');
-    let board_day = moment().format('2018-07-01');
+    let board_day = moment().format('2018-07-14');
 
     let token = req.headers.token; 
     let user_user_idx;
