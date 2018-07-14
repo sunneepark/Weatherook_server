@@ -24,7 +24,6 @@ router.post('/', async function(req, res){
         }
         weather_arr.push(weather_temp);
     }
-     
     res.status(201).send({
         message:"successfully get weather",
         data : weather_arr
