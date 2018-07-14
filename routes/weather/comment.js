@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const crypto = require('crypto-promise');
 const db = require('../../module/pool.js');
-
 //날씨 감성글 보여주기
 router.post('/', async function(req, res){
     let weather_temp=req.body.weather_temp;

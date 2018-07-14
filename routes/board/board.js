@@ -52,7 +52,7 @@ router.post('/',upload.single('board_img'), async function(req, res){
             //user정보가 존재시에
             else {
                 let user_id=checkBoardResult[0].user_id;
-                //let board_date = moment().format('YYYY-MM-DD HH:mm:ss'); 
+                board_date = moment().format('YYYY-MM-DD HH:mm:ss'); 
                 
                 //board 테이블에 게시글 정보 삽입
                 let insertBoardQuery = 'INSERT INTO board (board_img, board_desc, board_temp_min, board_temp_max, board_weather, board_auth, board_date, writer_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)'; 
