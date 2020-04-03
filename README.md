@@ -125,3 +125,4 @@ server {
 </br>
 5. sudo service nginx restart
 
+*현재 해당 Application은 AWS 지원 중단으로 서비스가 종료되었습니다. (19.04.30)*
